@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Collapse from "react-bootstrap/Collapse";
 
 const NavBar = ({
@@ -14,6 +14,7 @@ const NavBar = ({
   showLogin?: boolean;
 }) => {
   const [showMenu, setShowMenu] = React.useState<boolean>(false);
+  const location = useLocation();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -46,7 +47,10 @@ const NavBar = ({
             <ul className="navbar-nav">
               {menuItems.map((item) => (
                 <li className="nav-item" key={item.name}>
-                  <Link to={item.path} className="nav-link">
+                  <Link
+                    to={item.path}
+                    className={`nav-link ${location.pathname === item.path && "fw-bold"}`}
+                  >
                     {item.name}
                   </Link>
                 </li>

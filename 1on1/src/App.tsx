@@ -18,13 +18,6 @@ const App = () => {
           <Route path="features/" element={<Features />} />
           <Route path="support/" element={<Support />} />
         </Route>
-
-        <Route path="accounts/">
-          <Route path="login" element={<Login />} />
-        </Route>
-        <Route path="dashboard/">
-          <Route path="calendars/:calendar" element={<Calendars />} />
-        </Route>
       </Routes>
     </BrowserRouter>
   );

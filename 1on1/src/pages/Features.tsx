@@ -1,4 +1,3 @@
-import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 
 const Features = () => {
@@ -21,7 +20,6 @@ const Features = () => {
           </ul>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
