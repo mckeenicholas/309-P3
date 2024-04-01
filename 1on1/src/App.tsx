@@ -1,8 +1,8 @@
 import "./styles/app.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Calendars from "./pages/Calendars";
+// import Login from "./pages/Login";
+// import Calendars from "./pages/Calendars";
 import Pricing from "./pages/Pricing";
 import Features from "./pages/Features";
 import Support from "./pages/Support";

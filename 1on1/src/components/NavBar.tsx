@@ -27,7 +27,7 @@ const NavBar = ({
           <div className="sidebar-heading text-center py-2 primary-text fs-4 ms-3 me-3 fw-bold text-uppercase">
             <i
               className="fas fa-sharp fa-solid fa-lightbulb me-2"
-              style={{ color: "green" }}
+              style={{ color: "var(--primary-green)" }}
             ></i>
             1on1
           </div>
@@ -64,7 +64,7 @@ const NavBar = ({
                   </button>
                 </Link>
                 <Link to="/signup">
-                  <button className="btn btn-success" type="button">
+                  <button className="btn btn-success ms-2" type="button">
                     Sign Up
                   </button>
                 </Link>

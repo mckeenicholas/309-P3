@@ -14,34 +14,37 @@ body {
 }
 
 .btn-success {
-  background-color: var(--primary-green);
-  border-color: var(--dark-green);
+  background-color: var(--primary-green) !important;
+  border-color: var(--dark-green) !important;
 }
 
 .btn-success:hover {
-  background-color: var(--dark-green);
+  background-color: var(--dark-green) !important;
 }
 
 .btn-outline-success {
-  color: var(--primary-green);
-  border-color: var(--primary-green);
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
 }
 
 .btn-outline-success:hover {
-  background-color: var(--primary-green);
-  color: white;
+  background-color: var(--primary-green) !important;
+  color: white !important;
 }
 
 html {
   height: 100%;
   margin: 0;
 }
+
 #content-wrap {
   flex: 1 0 auto;
 }
+
 #footer {
   flex-shrink: 0;
 }
+
 .flex-wrapper {
   display: flex;
   flex-direction: column;
