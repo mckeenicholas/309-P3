@@ -1,6 +1,6 @@
 //import React from 'react';
 import CalendarCard from "../components/CalendarCard";
-import './Calendars.css'
+import '../styles/Calendars.css'
 
 const DashboardPage = () => {
     return (
