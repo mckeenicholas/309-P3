@@ -6,7 +6,8 @@ import Features from "./pages/Features";
 import Support from "./pages/Support";
 import Footer from "./components/Footer";
 import Calendars from "./pages/Calendars";
-import LogInPage from "./pages/Login";
+import LogInPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import AuthProvider from "./utils/AuthService";
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
             <Route path="features/" element={<Features />} />
             <Route path="support/" element={<Support />} />
             <Route path="login/" element={<LogInPage />} />
+            <Route path="signup/" element={<SignupPage />} />
           </Route>
           <Route path="calendar/" element={<Calendars />} />
         </Routes>

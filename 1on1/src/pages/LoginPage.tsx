@@ -12,9 +12,8 @@ const LogInPage = () => {
   const navigate = useNavigate();
 
   const logInRequest = async () => {
-
-    console.log(username)
-    console.log(password)
+    console.log(username);
+    console.log(password);
 
     if (await logIn(username, password)) {
       navigate("/dashboard");

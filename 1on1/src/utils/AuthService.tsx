@@ -73,19 +73,18 @@ const AuthProvider = ({ children }) => {
   };
 
   const logOut = async () => {
-    
     const response = await fetch(`${host}/accounts/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
     if (!response.ok) {
       throw new Error(await response.text());
     }
-    
+
     localStorage.removeItem(`1on1.token`);
     setToken(null);
     setUserId(null);
