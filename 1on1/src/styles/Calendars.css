@@ -1,188 +1,187 @@
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+  font-family: "Poppins", sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
 /* Sidebar Styles */
 :root {
-    --main-bg-color: white;
-    --main-text-color: #009d63;
-    --second-text-color: #bbbec5;
-    --second-bg-color: #c1efde;
+  --main-bg-color: white;
+  --main-text-color: #009d63;
+  --second-text-color: #bbbec5;
+  --second-bg-color: #c1efde;
 }
 
 .primary-text {
-    color: var(--main-text-color);
+  color: var(--main-text-color);
 }
 
 .second-text {
-    color: var(--second-text-color);
+  color: var(--second-text-color);
 }
 
 .primary-bg {
-    background-color: var(--main-bg-color);
+  background-color: var(--main-bg-color);
 }
 
 .secondary-bg {
-    background-color: var(--second-bg-color);
+  background-color: var(--second-bg-color);
 }
 
 .rounded-full {
-    border-radius: 100%;
+  border-radius: 100%;
 }
 
 #wrapper {
-    overflow-x: hidden;
-    
+  overflow-x: hidden;
 }
 
 #sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: 0rem;
-    -webkit-transition: margin 0.25s ease-out;
-    -moz-transition: margin 0.25s ease-out;
-    -o-transition: margin 0.25s ease-out;
-    transition: margin 0.25s ease-out;
+  min-height: 100vh;
+  margin-left: 0rem;
+  -webkit-transition: margin 0.25s ease-out;
+  -moz-transition: margin 0.25s ease-out;
+  -o-transition: margin 0.25s ease-out;
+  transition: margin 0.25s ease-out;
 }
 
 #sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
-    font-size: 1.2rem;
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
 }
 
 #sidebar-wrapper .list-group {
-    width: 15rem;
-    position: sticky;
+  width: 15rem;
+  position: sticky;
 }
 
 #page-content-wrapper {
-    min-width: 100vw;
+  min-width: 100vw;
 }
 
 #wrapper.toggled #sidebar-wrapper {
-    margin-left: -15rem;
+  margin-left: -15rem;
 }
 
 #menu-toggle {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .list-group-item {
-    border: none;
-    padding: 20px 30px;
+  border: none;
+  padding: 20px 30px;
 }
 
 .list-group-item.active {
-    background-color: transparent;
-    color: var(--main-text-color);
-    font-weight: bold;
-    border: none;
+  background-color: transparent;
+  color: var(--main-text-color);
+  font-weight: bold;
+  border: none;
 }
 
 /* Adjustments for existing dashboard styles */
 
 .btn-circle.btn-xl {
-    width: 6rem;
-    height: 3rem;
-    font-size: 14px;
-    text-align: center;
+  width: 6rem;
+  height: 3rem;
+  font-size: 14px;
+  text-align: center;
 }
 
 .card-img-top {
-    width: 3rem;
+  width: 3rem;
 }
 
 .upcoming-cont {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Calendar */
 #calendar {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    background-color: #f4f4f4;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  background-color: #f4f4f4;
 }
 
 #calendar td,
 #calendar th {
-    text-align: center;
-    height: 2.75rem;
-    width: 14.285714285714285714285714285714%;
-    user-select: none;
+  text-align: center;
+  height: 2.75rem;
+  width: 14.285714285714285714285714285714%;
+  user-select: none;
 }
 
 #calendar td:hover:not(.empty-day),
-#calendar .selected-day, 
+#calendar .selected-day,
 .day-container > .day > .time-slots td:hover,
 .day-container > .day > .time-slots .selected-time {
-    background-color: #4ff39c;
-    cursor: pointer;
+  background-color: #4ff39c;
+  cursor: pointer;
 }
 
 #spacer {
-    height: 35vh; /* This creates a space of the height of the viewport */
+  height: 35vh; /* This creates a space of the height of the viewport */
 }
 #spacer-2 {
-    height:0.5rem;
+  height: 0.5rem;
 }
 
 /* Time selection */
 .day-container {
-    display: flex;
-    overflow-x: auto; /* Enables horizontal scrolling */
-    white-space: nowrap; /* Keeps the .day divs in a single line */
-    padding: 10px;
-    background-color: #f0f0f0;
+  display: flex;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  white-space: nowrap; /* Keeps the .day divs in a single line */
+  padding: 10px;
+  background-color: #f0f0f0;
 }
-  
+
 .day {
-    flex: none; /* Prevents the items from growing or shrinking */
-    border: 1px solid #ccc;
-    margin-right: 10px; /* Space between days */
-    background-color: #fff;
+  flex: none; /* Prevents the items from growing or shrinking */
+  border: 1px solid #ccc;
+  margin-right: 10px; /* Space between days */
+  background-color: #fff;
 }
-  
+
 .date-header {
-    padding: 5px;
-    background-color: #007bff; /* Example color */
-    color: #ffffff;
-    text-align: center;
+  padding: 5px;
+  background-color: #007bff; /* Example color */
+  color: #ffffff;
+  text-align: center;
 }
-  
+
 .time-slots {
-    width: 100px; /* Set a specific width for each day's column */
-    border-collapse: collapse;
-    font-size: 0.7rem;
+  width: 100px; /* Set a specific width for each day's column */
+  border-collapse: collapse;
+  font-size: 0.7rem;
 }
-  
+
 .time-slots td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 5px;
-    user-select: none;
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 5px;
+  user-select: none;
 }
 
 .time-avalibility {
-    width: 300px;
-    border-collapse: collapse;
-    font-size: 0.7rem;
+  width: 300px;
+  border-collapse: collapse;
+  font-size: 0.7rem;
 }
 
 .time-avalibility td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 5px;
-    user-select: none;
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 5px;
+  user-select: none;
 }
-  
+
 .schedule-item {
-    border-radius: 10px;
-    background-color: #4ff39c;
-    padding: 10px;
+  border-radius: 10px;
+  background-color: #4ff39c;
+  padding: 10px;
 }

@@ -12,17 +12,17 @@ import AuthProvider from "./utils/AuthService";
 const App = () => {
   return (
     <BrowserRouter>
-    <AuthProvider>
-      <Routes>
-        <Route element={<Footer />}>
-          <Route index element={<Home />} />
-          <Route path="pricing/" element={<Pricing />} />
-          <Route path="features/" element={<Features />} />
-          <Route path="support/" element={<Support />} />
-          <Route path="login/" element={<LogInPage />} />
-        </Route>
-        <Route path="calendar/" element={<Calendars />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<Footer />}>
+            <Route index element={<Home />} />
+            <Route path="pricing/" element={<Pricing />} />
+            <Route path="features/" element={<Features />} />
+            <Route path="support/" element={<Support />} />
+            <Route path="login/" element={<LogInPage />} />
+          </Route>
+          <Route path="calendar/" element={<Calendars />} />
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
