@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
     try {
       const data = { username: username, password: password };
 
-      const response = await fetch(`${host}/accounts/login`, {
+      const response = await fetch(`${host}/accounts/login/`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {

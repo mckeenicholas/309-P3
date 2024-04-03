@@ -12,6 +12,10 @@ const LogInPage = () => {
   const navigate = useNavigate();
 
   const logInRequest = async () => {
+
+    console.log(username)
+    console.log(password)
+
     if (await logIn(username, password)) {
       navigate("/dashboard");
     } else {
@@ -43,6 +47,7 @@ const LogInPage = () => {
               id="userid"
               required
               onChange={(e) => setUsername(e.target.value)}
+              value={username}
             />
             <label htmlFor="password" className="text-muted">
               Password
