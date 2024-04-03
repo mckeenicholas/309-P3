@@ -20,6 +20,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         src={calendarPic}
         className="card-img-top ms-2 mt-1 calendar-pic"
         alt="Calendar"
+        style={{ width: "100px", height: "auto" }} // Adjust the width as needed
       />
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
