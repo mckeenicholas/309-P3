@@ -22,7 +22,7 @@ const AuthContext = React.createContext<IAuthContext>({
   userId: null,
   valid: false,
   logIn: async () => false,
-  logOut: () => {},
+  logOut: async () => {},
 });
 
 const AuthProvider = ({ children }) => {
@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
     try {
       const data = { username: username, password: password };
 
-      const response = await fetch(`${host}/accounts/login/`, {
+      const response = await fetch(`${host}/accounts/token/`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -58,9 +58,12 @@ const AuthProvider = ({ children }) => {
         return false;
       }
 
-      const { token } = await response.json();
-      setLocalStorage("token", token);
+      const { access } = await response.json();
+
+      setLocalStorage("token", access);
+      setLocalStorage("username", username);
       setToken(token);
+      setUserId(username);
 
       return true;
     } catch (error) {
@@ -69,10 +72,23 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const logOut = () => {
-    // Send a request to invalidate the token as well
+  const logOut = async () => {
+    
+    const response = await fetch(`${host}/accounts/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    
     localStorage.removeItem(`1on1.token`);
-    setToken("");
+    setToken(null);
+    setUserId(null);
   };
 
   const value = {

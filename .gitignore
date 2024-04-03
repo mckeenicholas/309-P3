@@ -1,6 +1,11 @@
 # Python virtual enviroment
 venv
 
+# Database
+backend/db.sqlite3
+
+*.pyc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
