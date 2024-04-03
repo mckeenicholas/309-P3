@@ -58,16 +58,22 @@ const SignupPage = () => {
       )
     ) {
       setHasError({ status: true, message: "Email is invalid" });
+      setFormData({ ...formData, password1: "", password2: "" });
       return;
     }
 
     if (formData.password1.length < 8) {
-        setHasError({ status: true, message: "Password must be at least 8 characters" });
-        return;
-      }
-    
+      setHasError({
+        status: true,
+        message: "Password must be at least 8 characters",
+      });
+      setFormData({ ...formData, password1: "", password2: "" });
+      return;
+    }
+
     if (formData.password1 !== formData.password2) {
       setHasError({ status: true, message: "Passwords didn't match" });
+      setFormData({ ...formData, password1: "", password2: "" });
       return;
     }
 
@@ -86,7 +92,15 @@ const SignupPage = () => {
     });
 
     if (!response.ok) {
-      setHasError({ status: true, message: await response.text() });
+      const error = (await response.json()).error;
+
+      setHasError({
+        status: true,
+        message: Object.values(error)
+          .flatMap((value) => value)
+          .join(" "),
+      });
+      setFormData({ ...formData, password1: "", password2: "" });
     } else {
       navigate("/login");
     }
