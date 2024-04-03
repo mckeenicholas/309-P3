@@ -6,7 +6,6 @@ import React from "react";
 const LogInPage = () => {
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
-
   const [hasError, setHasError] = React.useState<boolean>(false);
 
   const { logIn } = useAuth();
