@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Calendars from "./pages/Calendars";
 import LogInPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import Contacts from "./pages/Contacts";
 import AuthProvider from "./utils/AuthService";
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="signup/" element={<SignupPage />} />
           </Route>
           <Route path="calendar/" element={<Calendars />} />
+          <Route path="contacts/" element={<Contacts />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
