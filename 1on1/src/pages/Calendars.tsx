@@ -1,40 +1,51 @@
-//import React from 'react';
+import  { useEffect, useState } from 'react';
 import CalendarCard from "../components/CalendarCard";
 import "../styles/Calendars.css";
+import useRequest from '../utils/requestHandler'
+
+// Define a TypeScript interface for the calendar items
+interface CalendarItem {
+  id: string;
+  title: string;
+  date: string;
+  timeRange: string;
+  responsePending: boolean;
+}
 
 const DashboardPage = () => {
+  const apiFetch = useRequest();
+  const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      const response = await apiFetch('calendars/', { method: "GET" }); // Use GET method
+      if (response) {
+        setCalendars(response); // Update state with fetched calendars
+      }
+    };
+
+    fetchCalendars();
+  }, [apiFetch]); // Dependency array to avoid fetching more than once
+
   return (
     <div id="wrapper" className="d-flex">
-      {/* Sidebar (omitted for brevity) */}
+      {/* Sidebar & Page Content omitted for brevity */}
 
-      {/* Page Content */}
       <div id="page-content-wrapper">
-        <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-          {/* Toggler & Brand (omitted for brevity) */}
-        </nav>
+        {/* Navbar omitted for brevity */}
 
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">My Calendars</h3>
           <div className="upcoming-cont">
-            {/* Render the CalendarCard component three times */}
-            <CalendarCard
-              title="My Calendar"
-              date="Friday, January 30th"
-              timeRange="6:00 - 7:00 PM"
-              responsePending={true}
-            />
-            <CalendarCard
-              title="Team Meeting"
-              date="Monday, February 5th"
-              timeRange="2:00 - 3:00 PM"
-              responsePending={false}
-            />
-            <CalendarCard
-              title="Project Deadline"
-              date="Wednesday, February 10th"
-              timeRange="All Day"
-              responsePending={false}
-            />
+            {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
+              <CalendarCard
+                key={calendar.id}
+                title={calendar.title}
+                date={calendar.date}
+                timeRange={calendar.timeRange}
+                responsePending={calendar.responsePending}
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -24,7 +24,7 @@ const App = () => {
             <Route path="login/" element={<LogInPage />} />
             <Route path="signup/" element={<SignupPage />} />
           </Route>
-          <Route path="calendar/" element={<Calendars />} />
+          <Route path="dashboard/" element={<Calendars />} />
           <Route path="contacts/" element={<Contacts />} />
         </Routes>
       </AuthProvider>
