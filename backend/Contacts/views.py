@@ -19,8 +19,10 @@ class AddContact(APIView):
     def post(self, request):
         serializer = ContactCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response({'message': 'Contact added successfully'}, status=status.HTTP_201_CREATED)
+            contact = serializer.save()
+            response_serializer = ContactSerializer(contact, context={'request': request})
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+            #return Response({'message': 'Contact added successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteContactView(APIView):

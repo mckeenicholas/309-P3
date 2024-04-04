@@ -45,7 +45,7 @@ const Contacts = () => {
 				}
 			} catch (error) {
 				console.error('Failed to fetch contacts:', error);
-				// Handle error condition, possibly set an error state
+				// TODO: handle errors here
 			}
 		};
 		fetchContacts();
@@ -55,12 +55,19 @@ const Contacts = () => {
 	const closeModal = () => setIsModalOpen(false);
 	const saveChanges = async () => {
 		console.log(fullname, email, phone);
-		await sendRequest('/contacts/add/', {
+		const result = await sendRequest('/contacts/add/', {
 			method: "POST",
 			body: JSON.stringify({
 				username: username
 			})
 		})
+
+		console.log(result)
+		setContacts(prev => [...prev, {
+			id: result.id,
+			email: result.contactee_info.email,
+			fullname: result.contactee_info.first_name + result.contactee_info.last_name
+		}])
 		// error checking in case the request method fails, i.e. username DNE
 		// TODO
 		closeModal();
