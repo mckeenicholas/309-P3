@@ -2,6 +2,7 @@ import  { useEffect, useState } from 'react';
 import CalendarCard from "../components/CalendarCard";
 import "../styles/Calendars.css";
 import useRequest from '../utils/requestHandler'
+import Sidebar from '../components/Sidebar';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -29,7 +30,7 @@ const DashboardPage = () => {
 
   return (
     <div id="wrapper" className="d-flex">
-      {/* Sidebar & Page Content omitted for brevity */}
+      <Sidebar />
 
       <div id="page-content-wrapper">
         {/* Navbar omitted for brevity */}
