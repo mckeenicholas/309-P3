@@ -9,7 +9,7 @@ class ContactList(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        contacts = Contact.objects.filter(owner=request.user)
+        contacts = Contact.objects.filter(owner=request.user).select_related('contactee')
         serializer = ContactSerializer(contacts, many=True)
         return Response(serializer.data)
 
