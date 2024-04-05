@@ -1,5 +1,6 @@
-import  { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CalendarCard from "../components/CalendarCard";
+import CalendarAddModal from '../components/CalendarAddModal';
 import "../styles/Calendars.css";
 import useRequest from '../utils/requestHandler'
 import Sidebar from '../components/Sidebar';
@@ -14,6 +15,11 @@ interface CalendarItem {
 }
 
 const DashboardPage = () => {
+  // Create calendars modal
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [name, setName] = React.useState<string>("");
+  const [selected, setSelected] = React.useState<Date[]>([]);
+
   const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
 
@@ -28,6 +34,13 @@ const DashboardPage = () => {
     fetchCalendars();
   }, [apiFetch]); // Dependency array to avoid fetching more than once
 
+  const openCreateModal = () => setIsCreateModalOpen(true);
+  const closeCreateModal = () => setIsCreateModalOpen(false);
+  const saveChanges = async () => {
+    // Implement this function to save the new calendar
+    closeCreateModal();
+  };
+
   return (
     <div id="wrapper" className="d-flex">
       <Sidebar />
@@ -37,6 +50,17 @@ const DashboardPage = () => {
 
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">My Calendars</h3>
+          <button type="button" className="btn btn-outline-success mt-3" onClick={openCreateModal}>Create Calendar
+          </button>
+          <CalendarAddModal
+            isOpen={isCreateModalOpen}
+            onClose={closeCreateModal}
+            onSave={saveChanges}
+            name={name}
+            setName={setName}
+            selected={[]}
+            setSelected={setSelected} // Add the missing setSelected property
+          />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
@@ -50,6 +74,8 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+
+
     </div>
   );
 };
