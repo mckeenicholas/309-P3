@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/ContactAddModal.css';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { format } from 'date-fns';
 
 interface CalendarAddModalProps {
     isOpen: boolean;
@@ -9,8 +10,8 @@ interface CalendarAddModalProps {
     onSave: () => void;
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
-    selected: Date[];
-    setSelected: React.Dispatch<React.SetStateAction<Date[]>>;
+    selectedDays: Date[];
+    setSelectedDays: React.Dispatch<React.SetStateAction<Date[]>>;
 }
 
 
@@ -20,11 +21,16 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
     onSave,
     name,
     setName,
-    selected,
-    setSelected,
+    selectedDays,
+    setSelectedDays,
 }) => {
     if (!isOpen) return null;
-
+    const footer =
+        selectedDays && selectedDays.length > 0 ? (
+            <p>You selected {selectedDays.length} day(s).</p>
+        ) : (
+            <p>Please pick one or more days.</p>
+        );
     return (
         <div className="modal-overlay">
             <div className="modal-haha">
@@ -45,8 +51,9 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
                         <h5>Select days you are free:</h5>
                         <DayPicker
                             mode="multiple"
-                            selected={selected}
-                            onSelect={(days = []) => setSelected(days)}
+                            selected={selectedDays}
+                            onSelect={(value) => { setSelectedDays(value as Date[]); }}
+                            footer={footer}
                         />
                     </div>
                     <div className="modal-footer">

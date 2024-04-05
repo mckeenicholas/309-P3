@@ -18,7 +18,8 @@ const DashboardPage = () => {
   // Create calendars modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [name, setName] = React.useState<string>("");
-  const [selected, setSelected] = React.useState<Date[]>([]);
+  const initialDays: Date[] = [new Date()];
+  const [days, setDays] = React.useState<Date[]>(initialDays);
 
   const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
@@ -58,8 +59,8 @@ const DashboardPage = () => {
             onSave={saveChanges}
             name={name}
             setName={setName}
-            selected={[]}
-            setSelected={setSelected} // Add the missing setSelected property
+            selectedDays={days}
+            setSelectedDays={setDays} // Add the missing setSelected property
           />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here

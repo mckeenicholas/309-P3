@@ -94,7 +94,8 @@
 }
 
 /* Calendar */
-#calendar {
+
+/* #calendar {
   margin-left: auto;
   margin-right: auto;
   margin-top: 2rem;
@@ -113,44 +114,44 @@
 
 #calendar td:hover:not(.empty-day),
 #calendar .selected-day,
-.day-container > .day > .time-slots td:hover,
-.day-container > .day > .time-slots .selected-time {
+.day-container>.day>.time-slots td:hover,
+.day-container>.day>.time-slots .selected-time {
   background-color: #4ff39c;
   cursor: pointer;
 }
 
 #spacer {
-  height: 35vh; /* This creates a space of the height of the viewport */
+  height: 35vh;
 }
+
 #spacer-2 {
   height: 0.5rem;
 }
 
-/* Time selection */
 .day-container {
   display: flex;
-  overflow-x: auto; /* Enables horizontal scrolling */
-  white-space: nowrap; /* Keeps the .day divs in a single line */
+  overflow-x: auto;
+  white-space: nowrap;
   padding: 10px;
   background-color: #f0f0f0;
 }
 
 .day {
-  flex: none; /* Prevents the items from growing or shrinking */
+  flex: none;
   border: 1px solid #ccc;
-  margin-right: 10px; /* Space between days */
+  margin-right: 10px;
   background-color: #fff;
 }
 
 .date-header {
   padding: 5px;
-  background-color: #007bff; /* Example color */
+  background-color: #007bff;
   color: #ffffff;
   text-align: center;
 }
 
 .time-slots {
-  width: 100px; /* Set a specific width for each day's column */
+  width: 100px;
   border-collapse: collapse;
   font-size: 0.7rem;
 }
@@ -179,4 +180,4 @@
   border-radius: 10px;
   background-color: #4ff39c;
   padding: 10px;
-}
+} */
