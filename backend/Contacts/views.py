@@ -28,9 +28,9 @@ class AddContact(APIView):
 class DeleteContactView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, username):
+    def delete(self, request, contactee):
         try:
-            contactee = User.objects.get(username=username)
+            #contactee = User.objects.get(username=contactee)
             contact = Contact.objects.get(owner=request.user, contactee=contactee)
             contact.delete()
             return Response({'message': 'Contact deleted successfully'}, status=status.HTTP_204_NO_CONTENT)

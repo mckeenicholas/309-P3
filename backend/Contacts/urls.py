@@ -5,5 +5,5 @@ app_name = 'contacts'
 urlpatterns = [
     path('', ContactList.as_view(), name='contact-list'),
     path('add/', AddContact.as_view(), name='add'),
-    path('delete/<str:username>/', DeleteContactView.as_view(), name='delete_contact'),
+    path('delete/<str:contactee>/', DeleteContactView.as_view(), name='delete_contact'),
 ]

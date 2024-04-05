@@ -5,11 +5,13 @@ interface CardProps {
 	name: string;
 	email: string;
 	phoneNumber: string;
+	onDelete: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ name, email, phoneNumber }) => {
+const Card: React.FC<CardProps> = ({ name, email, phoneNumber, onDelete }) => {
 	return (
 		<div className="card-container card border-dark">
+			<button className="delete-button" onClick={onDelete}>&times;</button>
 			<div className="avatar"></div>
 			<div className="info">
 				<h2>{name}</h2>
