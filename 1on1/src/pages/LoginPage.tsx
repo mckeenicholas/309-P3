@@ -12,9 +12,6 @@ const LogInPage = () => {
   const navigate = useNavigate();
 
   const logInRequest = async () => {
-    console.log(username);
-    console.log(password);
-
     if (await logIn(username, password)) {
       navigate("/dashboard");
     } else {
@@ -63,9 +60,9 @@ const LogInPage = () => {
             {hasError && (
               <p className="text-danger">Username or password is incorrect</p>
             )}
-            <a className="text-link" href="#">
+            <Link className="text-link" to="#">
               <p className="small">Forgot password?</p>
-            </a>
+            </Link>
             <button
               type="button"
               className="btn btn-success"

@@ -12,7 +12,6 @@ const getLocalStorage = (key: string) => {
 interface IAuthContext {
   token: string | null;
   userId: string | null;
-  valid: boolean;
   logIn: (username: string, password: string) => Promise<boolean>;
   logOut: () => void;
 }
@@ -20,27 +19,20 @@ interface IAuthContext {
 const AuthContext = React.createContext<IAuthContext>({
   token: null,
   userId: null,
-  valid: false,
   logIn: async () => false,
   logOut: async () => {},
 });
 
-const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }: any) => {
   const [token, setToken] = React.useState<string | null>(
     getLocalStorage("token"),
   );
   const [userId, setUserId] = React.useState<string | null>(
     getLocalStorage("userId"),
   );
-  const [expiration, setExpiration] = React.useState<string | null>(
-    getLocalStorage("expiration"),
+  const [refresh, setRefresh] = React.useState<string | null>(
+    getLocalStorage("refresh"),
   );
-
-  const valid = React.useMemo(() => {
-    return (userId &&
-      expiration &&
-      Date.now() < new Date(expiration).getTime()) as boolean;
-  }, [userId, expiration]);
 
   const logIn = async (username: string, password: string) => {
     try {
@@ -58,11 +50,13 @@ const AuthProvider = ({ children }) => {
         return false;
       }
 
-      const { access } = await response.json();
+      const { access, refresh } = await response.json();
 
       setLocalStorage("token", access);
+      setLocalStorage("refresh", refresh);
       setLocalStorage("username", username);
-      setToken(token);
+      setToken(access);
+      setRefresh(refresh);
       setUserId(username);
 
       return true;
@@ -73,27 +67,38 @@ const AuthProvider = ({ children }) => {
   };
 
   const logOut = async () => {
-    const response = await fetch(`${host}/accounts/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    console.log("test");
 
-    if (!response.ok) {
-      throw new Error(await response.text());
+    try {
+      const response = await fetch(`${host}/accounts/logout/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ refresh: refresh }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      localStorage.removeItem(`1on1.token`);
+
+      response.text().then(() => {
+        setToken(null);
+        setUserId(null);
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
 
-    localStorage.removeItem(`1on1.token`);
-    setToken(null);
-    setUserId(null);
+    return true;
   };
 
   const value = {
     token,
     userId,
-    valid,
     logIn,
     logOut,
   };

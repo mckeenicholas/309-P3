@@ -1,9 +1,11 @@
 import { useCallback } from "react";
 import { useAuth } from "./AuthService";
 import host from "./links";
+import { useNavigate } from "react-router-dom";
 
 const useRequest = () => {
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   return useCallback<any>(
     async (path: string, options = {}) => {
@@ -20,6 +22,13 @@ const useRequest = () => {
           }),
         );
 
+        // If user is unauthorized, send them back to login page
+        if (response.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        // Handle all other errors
         if (!response.ok) {
           throw new Error(await response.text());
         }
