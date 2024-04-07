@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import "./side.css";
+//import "../styles/dashboard.css";
 const Sidebar: React.FC = () => {
     return (
         <div className="bg-white" id="sidebar-wrapper">
