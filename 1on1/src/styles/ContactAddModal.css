@@ -20,6 +20,14 @@
 	z-index: 100;
 }
 
+.modal-fit {
+	background: white;
+	padding: 20px;
+	border-radius: 5px;
+	width: auto;
+	z-index: 100;
+}
+
 .modal-header {
 	display: flex;
 	justify-content: space-between;
