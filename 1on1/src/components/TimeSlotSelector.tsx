@@ -121,7 +121,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 <option value="low">Low Priority</option>
             </select>
             <div style={dayContainerStyle} onMouseUp={handleMouseUp}>
-                {days.map(day => (
+                {days.sort().map(day => (
                     <div key={day} style={{ width: '80px', textAlign: 'center' }}>
                         <h5>{moment(day).format('MMM. DD')}</h5>
                         <div>
@@ -131,8 +131,8 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                                         key={slot.dateTime}
                                         style={{
                                             ...timeSlotButtonStyle,
-                                            backgroundColor: selectedSlots.highPriority.includes(slot.dateTime) ? 'red' :
-                                                selectedSlots.lowPriority.includes(slot.dateTime) ? 'yellow' : ''
+                                            backgroundColor: selectedSlots.highPriority.includes(slot.dateTime) ? '#029a02' :
+                                                selectedSlots.lowPriority.includes(slot.dateTime) ? '#e5e82a' : ''
                                         }}
                                         onMouseDown={(e) => handleMouseDown(e, slot.dateTime)}
                                         onContextMenu={(e) => e.preventDefault()}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/ContactAddModal.css';
 import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/dist/style.css';
+import '../styles/rdp_styles.css';
 import { format } from 'date-fns';
 import TimeSlotSelector from './TimeSlotSelector'; // Adjust the import path as necessary
 
@@ -13,6 +13,10 @@ interface CalendarAddModalProps {
     setName: React.Dispatch<React.SetStateAction<string>>;
     selectedDays: Date[];
     setSelectedDays: React.Dispatch<React.SetStateAction<Date[]>>;
+    selectedHighPriority: string[];
+    setSelectedHighPriority: React.Dispatch<React.SetStateAction<string[]>>;
+    selectedLowPriority: string[];
+    setSelectedLowPriority: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 
@@ -25,9 +29,12 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
     setName,
     selectedDays,
     setSelectedDays,
+    selectedHighPriority,
+    setSelectedHighPriority,
+    selectedLowPriority,
+    setSelectedLowPriority,
 }) => {
-    const [selectedHighPriority, setSelectedHighPriority] = useState<string[]>([]);
-    const [selectedLowPriority, setSelectedLowPriority] = useState<string[]>([]);
+
 
     React.useEffect(() => {
         if (isOpen) {

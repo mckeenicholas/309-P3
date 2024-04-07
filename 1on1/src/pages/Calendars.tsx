@@ -20,6 +20,8 @@ const DashboardPage = () => {
   const [name, setName] = React.useState<string>("");
   const initialDays: Date[] = [new Date()];
   const [days, setDays] = React.useState<Date[]>(initialDays);
+  const [selectedHighPriority, setSelectedHighPriority] = useState<string[]>([]);
+  const [selectedLowPriority, setSelectedLowPriority] = useState<string[]>([]);
 
   const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
@@ -61,6 +63,10 @@ const DashboardPage = () => {
             setName={setName}
             selectedDays={days}
             setSelectedDays={setDays} // Add the missing setSelected property
+            selectedHighPriority={selectedHighPriority}
+            setSelectedHighPriority={setSelectedHighPriority}
+            selectedLowPriority={selectedLowPriority}
+            setSelectedLowPriority={setSelectedLowPriority}
           />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
