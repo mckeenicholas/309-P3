@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/ContactCard';
+import ContactDeleteConfirmationModal from '../components/ContactDeleteConfirmationModal';
 import ContactAddModal from '../components/ContactAddModal';
+import Sidebar from '../components/Sidebar';
 import '../styles/Contacts.css'
 import useRequest from '../utils/requestHandler'
 
@@ -31,6 +33,8 @@ const Contacts = () => {
 	const [phone, setPhone] = React.useState<string>("");
 	const [contacts, setContacts] = useState<Contact[]>([]);
 	// const [error, setError] = useState<string | null>(null);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 	const sendRequest = useRequest();
 
 	useEffect(() => {
@@ -80,6 +84,22 @@ const Contacts = () => {
 		}
 		closeModal();
 	};
+
+	const openDeleteModal = (contact: Contact) => {
+		setContactToDelete(contact);
+		setIsDeleteModalOpen(true);
+	};
+
+	const closeDeleteModal = () => {
+		setIsDeleteModalOpen(false);
+		setContactToDelete(null);
+	};
+	const confirmDelete = async () => {
+		if (contactToDelete) {
+			await deleteContact(contactToDelete.contactee.toString());
+			closeDeleteModal();
+		}
+	};
 	const deleteContact = async (contactee: string) => {
 		try {
 			await sendRequest(`/contacts/delete/${contactee}/`, { method: "DELETE" });
@@ -89,23 +109,29 @@ const Contacts = () => {
 			alert("Failed to delete contact.");
 		}
 	}
+
 	return (
-		<>
-			{/* {error && <div className="error-message">{error}</div>} */}
-			<div className="cards-container">
-				{contacts.map(contact => (
-					<Card
-						key={contact.id}
-						name={contact.fullname}
-						email={contact.email}
-						phoneNumber={'111-222-7878'}
-						onDelete={() => deleteContact(contact.contactee.toString())}
-					/>
-				))}
+        <div id="wrapper" className="d-flex">
+			<Sidebar />
+			<div id="page-content-wrapper">
+				<div className="col-md-9">
+					<div className="cards-container">
+						{contacts.map(contact => (
+							<Card
+								key={contact.id}
+								name={contact.fullname}
+								email={contact.email}
+								phoneNumber={'111-222-7878'}
+								onDelete={() => openDeleteModal(contact)}
+							/>
+						))}
+					</div>
+					<button className="add-contact-btn btn btn-outline-success mt-5" onClick={openModal}>Add New Contact</button>
+				</div>
 			</div>
-			<button className="add-contact-btn btn btn-outline-success mt-5" onClick={openModal}>Add New Contact</button>
-			<ContactAddModal
-				isOpen={isModalOpen}
+
+            <ContactAddModal
+                isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				onSave={saveChanges}
 				fullname={fullname}
@@ -116,9 +142,15 @@ const Contacts = () => {
 				setEmail={setEmail}
 				phone={phone}
 				setPhone={setPhone}
-			/>
-		</>
-	);
+            />
+            <ContactDeleteConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
+                contactName={contactToDelete ? contactToDelete.fullname : ''}
+            />
+		</div>
+    );	
 };
 
 export default Contacts;
