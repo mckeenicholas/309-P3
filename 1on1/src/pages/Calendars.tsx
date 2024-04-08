@@ -23,6 +23,9 @@ const DashboardPage = () => {
   const [selectedHighPriority, setSelectedHighPriority] = useState<string[]>([]);
   const [selectedLowPriority, setSelectedLowPriority] = useState<string[]>([]);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
 
@@ -86,11 +89,11 @@ const DashboardPage = () => {
 
   return (
     <div id="wrapper" className="d-flex">
-      <Sidebar />
+      {isSidebarOpen && <Sidebar />}
 
       <div id="page-content-wrapper">
         {/* Navbar omitted for brevity */}
-        <DashNavbar />
+        <DashNavbar onToggleSidebar={toggleSidebar} />
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">My Calendars</h3>
           <button type="button" className="btn btn-outline-success mt-3" onClick={openCreateModal}>Create Calendar
