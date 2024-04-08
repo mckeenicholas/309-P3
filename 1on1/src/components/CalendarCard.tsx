@@ -6,6 +6,7 @@ interface CalendarCardProps {
   date: string;
   timeRange: string;
   responsePending: boolean;
+  allResponded: boolean; // New prop to indicate if all participants have responded
   onEditAvailability: () => void;
 }
 
@@ -14,6 +15,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   date,
   timeRange,
   responsePending,
+  allResponded,
   onEditAvailability,
 }) => {
   return (
@@ -38,9 +40,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           data-bs-toggle="modal"
           data-bs-target={responsePending ? "#seeResults" : "#seeResultsGreen"}
         >
-          {responsePending
-            ? "See participants - Waiting for responses"
-            : "See participants - All have responded"}
+          {responsePending ? "See participants - Waiting for responses" : "See participants - All have responded"}
         </a>
       </div>
       <div className="card-body">
@@ -53,6 +53,11 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         >
           Edit my availability
         </a>
+      </div>
+      <div className="card-footer">
+        <button className="btn btn-primary" disabled={!allResponded}>
+          Finalize
+        </button>
       </div>
     </div>
   );
