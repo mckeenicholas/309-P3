@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, CSSProperties } from 'react';
 import moment from 'moment';
+import '../styles/TimeSlotSelector.css';
 
 interface TimeSlotSelectorProps {
     days: string[];
@@ -27,13 +28,6 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
     selectedHighPriority,
     selectedLowPriority,
 }) => {
-    const dayContainerStyle: CSSProperties = {
-        display: 'flex',
-        overflowX: 'auto',
-        gap: '5px',
-        width: '500px',
-        marginTop: '10px',
-    };
 
     const timeSlotButtonStyle: CSSProperties = {
         display: 'block',
@@ -120,7 +114,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 <option value="high">High Priority</option>
                 <option value="low">Low Priority</option>
             </select>
-            <div style={dayContainerStyle} onMouseUp={handleMouseUp}>
+            <div className='day-container' onMouseUp={handleMouseUp}>
                 {days.sort().map(day => (
                     <div key={day} style={{ width: '80px', textAlign: 'center' }}>
                         <h5>{moment(day).format('MMM. DD')}</h5>

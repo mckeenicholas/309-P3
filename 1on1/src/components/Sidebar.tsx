@@ -1,23 +1,7 @@
 import React from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../utils/AuthService';
-
-//import "../styles/dashboard.css";
+import { Link } from 'react-router-dom';
+import "../styles/dashboard.css";
 const Sidebar: React.FC = () => {
-
-    const { logOut } = useAuth();
-    const navigate = useNavigate();
-
-    const logoutWrapper = async () => {
-        const sucess = await logOut();
-        console.log(sucess);
-        if (sucess! === true) {
-            navigate("/dashboard");
-        } else {
-            alert(sucess);
-        }
-    }
-
     return (
         <div className="bg-white" id="sidebar-wrapper">
             <div className="sidebar-heading text-center py-4 primary-text fs-4 fw-bold text-uppercase border-bottom">
@@ -42,9 +26,9 @@ const Sidebar: React.FC = () => {
                 <Link to="/about" className="list-group-item list-group-item-action bg-transparent second-text">
                     <i className="fas fa-info-circle me-2"></i>About
                 </Link>
-                <button onClick={logoutWrapper} className="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
+                <Link to="/logout" className="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
                     <i className="fas fa-power-off me-2"></i>Logout
-                </button>
+                </Link>
             </div>
         </div>
     );
