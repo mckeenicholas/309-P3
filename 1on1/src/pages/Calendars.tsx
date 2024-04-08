@@ -42,7 +42,7 @@ const DashboardPage = () => {
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
-  const saveChanges = async () => {
+  const createCalendar = async () => {
     // Create a new calendar
     const newCalendarResponse = await apiFetch('calendars/', {
       method: "POST",
@@ -101,7 +101,7 @@ const DashboardPage = () => {
           <CalendarAddModal
             isOpen={isCreateModalOpen}
             onClose={closeCreateModal}
-            onSave={saveChanges}
+            onSave={createCalendar}
             name={name}
             setName={setName}
             selectedDays={days}
