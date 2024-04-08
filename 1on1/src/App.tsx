@@ -10,6 +10,7 @@ import LogInPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import Contacts from "./pages/Contacts";
 import AuthProvider from "./utils/AuthService";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
           </Route>
           <Route path="dashboard/" element={<Calendars />} />
           <Route path="contacts/" element={<Contacts />} />
+          <Route path='*' element={<NotFound />}/>
         </Routes>
       </AuthProvider>
     </BrowserRouter>

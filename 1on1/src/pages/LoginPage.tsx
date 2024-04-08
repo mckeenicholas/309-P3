@@ -7,6 +7,7 @@ const LogInPage = () => {
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [hasError, setHasError] = React.useState<boolean>(false);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
 
   const { logIn } = useAuth();
   const navigate = useNavigate();
@@ -17,6 +18,17 @@ const LogInPage = () => {
     } else {
       setHasError(true);
       setPassword("");
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      if (event.currentTarget === passwordRef.current) {
+        logInRequest();
+      } else {
+        event.preventDefault();
+        passwordRef.current?.focus();
+      }
     }
   };
 
@@ -44,11 +56,13 @@ const LogInPage = () => {
               required
               onChange={(e) => setUsername(e.target.value)}
               value={username}
+              onKeyDown={handleKeyDown}
             />
             <label htmlFor="password" className="text-muted">
               Password
             </label>
             <input
+              ref={passwordRef}
               className="form-control mb-3"
               type="password"
               name="Username"
@@ -56,6 +70,7 @@ const LogInPage = () => {
               required
               onChange={(e) => setPassword(e.target.value)}
               value={password}
+              onKeyDown={handleKeyDown}
             />
             {hasError && (
               <p className="text-danger">Username or password is incorrect</p>
