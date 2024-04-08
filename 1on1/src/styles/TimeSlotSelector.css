@@ -1,0 +1,17 @@
+.day-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 5px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.day-container h5 {
+    font-size: 16px;
+}
+
+@media (min-width: 768px) {
+    .day-container h5 {
+        font-size: 20px;
+    }
+}
