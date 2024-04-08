@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="d-flex flex-column flex-shrink-0 p-3 text-white bg-light" style={{ width: "280px" }}>
+        <div className="d-flex flex-column flex-shrink-0 p-3 text-white bg-light" style={{ width: "280px", height: "100vh" }}>
             <div className="sidebar-heading text-center py-4 primary-text fs-4 fw-bold text-uppercase border-bottom">
                 <i className="fas fa-sharp fa-solid fa-lightbulb me-2" style={{ color: 'green' }}></i>1on1
             </div>
@@ -21,7 +21,7 @@ const Sidebar: React.FC = () => {
                 </Link>
             </div>
             <div id="spacer"></div>
-            <ul className="nav nav-pills flex-column mb-auto">
+            <ul className="nav nav-pills flex-column mt-auto">
                 <li>
                     <Link to="/settings" className="nav-link text-dark">
                         <i className="fas fa-cog me-2"></i>Settings
