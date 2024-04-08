@@ -20,7 +20,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         src={calendarPic}
         className="card-img-top ms-2 mt-1 calendar-pic"
         alt="Calendar"
-        style={{ width: "100px", height: "auto" }} // Adjust the width as needed
+        style={{ width: "50px", height: "auto" }} // Adjust the width as needed
       />
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
@@ -37,8 +37,8 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           data-bs-target={responsePending ? "#seeResults" : "#seeResultsGreen"}
         >
           {responsePending
-            ? "1 person has not responded"
-            : "Everybody is ready to meet!"}
+            ? "See participants - Waiting for responses"
+            : "See participants - All have responded"}
         </a>
       </div>
       <div className="card-body">
@@ -48,7 +48,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           data-bs-toggle="modal"
           data-bs-target="#viewCalendarAdmin"
         >
-          See Calendar
+          Edit my availability
         </a>
       </div>
     </div>
