@@ -26,21 +26,61 @@ const DashboardPage = () => {
   const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
 
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      const response = await apiFetch('calendars/', { method: "GET" }); // Use GET method
-      if (response) {
-        setCalendars(response); // Update state with fetched calendars
-      }
-    };
+  const fetchCalendars = async () => {
+    const response = await apiFetch('calendars/', { method: "GET" }); // Use GET method
+    if (response) {
+      setCalendars(response); // Update state with fetched calendars
+    }
+  };
 
+  useEffect(() => {
     fetchCalendars();
   }, [apiFetch]); // Dependency array to avoid fetching more than once
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
   const saveChanges = async () => {
-    // Implement this function to save the new calendar
+    // Create a new calendar
+    const newCalendarResponse = await apiFetch('calendars/', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name, // Assuming your CalendarWriteSerializer expects a name
+        // Add any other fields required by your CalendarWriteSerializer here
+      })
+    });
+
+    if (newCalendarResponse && newCalendarResponse.id) {
+      // After creating a new calendar, add non-busy times to it
+      const calendarId = newCalendarResponse.id;
+
+      for (let day of days) {
+        // Format or transform `day` as needed by your NonBusyTimeWriteSerializer
+        // Example: converting Date to a string in 'YYYY-MM-DD' format
+        let formattedDay = day.toISOString().split('T')[0];
+
+        // Add non-busy time for each selected day
+        await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            date: formattedDay,
+            // Include any other fields required by your NonBusyTimeWriteSerializer
+            // For example, specifying the time range for the non-busy time
+          })
+        });
+      }
+
+      // Optionally, refresh calendars list to include the newly created calendar
+      // and its non-busy times without reloading the page
+      await fetchCalendars();
+    }
+
+    // Close the create calendar modal
     closeCreateModal();
   };
 
