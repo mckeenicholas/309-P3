@@ -8,20 +8,21 @@ import DashNavbar from '../components/DashNavbar';
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
   id: string;
-  title: string;
-  date: string;
-  timeRange: string;
-  responsePending: boolean;
+  name: string;
+  meetingLength: string;
+  deadline: string;
+  finalizedDayOfWeek?: number;
+  finalizedTime?: string; // Format: "HH:MM:SS"
+  // Add new fields here if you're planning to use them on the frontend
 }
-
 const DashboardPage = () => {
   // Create calendars modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [name, setName] = React.useState<string>("");
-  const initialDays: Date[] = [new Date()];
-  const [days, setDays] = React.useState<Date[]>(initialDays);
   const [selectedHighPriority, setSelectedHighPriority] = useState<string[]>([]);
   const [selectedLowPriority, setSelectedLowPriority] = useState<string[]>([]);
+  const [meetingLength, setMeetingLength] = useState<number>(60); // Default meeting length [minutes]
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -40,50 +41,76 @@ const DashboardPage = () => {
     fetchCalendars();
   }, [apiFetch]); // Dependency array to avoid fetching more than once
 
+  const parseSelectedTime = (selectedTime: string[], preferenceLevel: number) => {
+    return selectedTime.map(time => {
+      const [dayOfWeek, startTime] = time.split('-');
+      let [hours, minutes] = startTime.split(':').map(Number);
+      minutes += 30; // Add 30 minutes
+      if (minutes >= 60) {
+        hours += 1;
+        minutes -= 60;
+      }
+
+      // Ensure hours and minutes are in "HH:MM" format
+      const endTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+      return {
+        day_of_week: parseInt(dayOfWeek),
+        start_time: startTime,
+        end_time: endTime,
+        preference_level: preferenceLevel
+      };
+    });
+  };
+  const saveChanges = async () => {
+    // Close the create calendar modal
+    closeCreateModal();
+
+    // Create the new calendar
+    const calendarData = {
+      name: name,
+      meeting_length: meetingLength,
+      deadline: deadline?.toISOString(),
+    };
+    const newCalendarResponse = await apiFetch('calendars/', {
+      method: "POST",
+      body: JSON.stringify(calendarData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!newCalendarResponse.id) {
+      console.error("Failed to create calendar");
+      return;
+    }
+
+    // Parse and add high priority non-busy times
+    const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
+    const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
+
+    // Combine both lists
+    const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
+
+    // Add each non-busy time to the calendar
+    nonBusyTimes.forEach(async (time) => {
+      await apiFetch(`calendars/${newCalendarResponse.id}/nonbusytimes/`, {
+        method: "POST",
+        body: JSON.stringify(time),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    });
+
+    // Refetch calendars to update UI
+    await fetchCalendars();
+  };
+
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
   const createCalendar = async () => {
-    // Create a new calendar
-    const newCalendarResponse = await apiFetch('calendars/', {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: name, // Assuming your CalendarWriteSerializer expects a name
-        // Add any other fields required by your CalendarWriteSerializer here
-      })
-    });
-
-    if (newCalendarResponse && newCalendarResponse.id) {
-      // After creating a new calendar, add non-busy times to it
-      const calendarId = newCalendarResponse.id;
-
-      for (let day of days) {
-        // Format or transform `day` as needed by your NonBusyTimeWriteSerializer
-        // Example: converting Date to a string in 'YYYY-MM-DD' format
-        let formattedDay = day.toISOString().split('T')[0];
-
-        // Add non-busy time for each selected day
-        await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            date: formattedDay,
-            // Include any other fields required by your NonBusyTimeWriteSerializer
-            // For example, specifying the time range for the non-busy time
-          })
-        });
-      }
-
-      // Optionally, refresh calendars list to include the newly created calendar
-      // and its non-busy times without reloading the page
-      await fetchCalendars();
-    }
-
-    // Close the create calendar modal
+    await saveChanges();
     closeCreateModal();
   };
 
@@ -104,21 +131,24 @@ const DashboardPage = () => {
             onSave={createCalendar}
             name={name}
             setName={setName}
-            selectedDays={days}
-            setSelectedDays={setDays} // Add the missing setSelected property
             selectedHighPriority={selectedHighPriority}
             setSelectedHighPriority={setSelectedHighPriority}
             selectedLowPriority={selectedLowPriority}
             setSelectedLowPriority={setSelectedLowPriority}
+            meetingLength={meetingLength}
+            setMeetingLength={setMeetingLength}
+            deadline={deadline}
+            setDeadline={setDeadline}
           />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
                 key={calendar.id}
-                title={calendar.title}
-                date={calendar.date}
-                timeRange={calendar.timeRange}
-                responsePending={calendar.responsePending}
+                title={calendar.name}
+                date={calendar.deadline}
+                timeRange={calendar.meetingLength}
+                responsePending={calendar.finalizedDayOfWeek === undefined || calendar.finalizedTime === undefined}
+                onEditAvailability={openCreateModal}
               />
             ))}
           </div>

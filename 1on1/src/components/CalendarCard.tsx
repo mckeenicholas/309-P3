@@ -6,6 +6,7 @@ interface CalendarCardProps {
   date: string;
   timeRange: string;
   responsePending: boolean;
+  onEditAvailability: () => void;
 }
 
 const CalendarCard: React.FC<CalendarCardProps> = ({
@@ -13,6 +14,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   date,
   timeRange,
   responsePending,
+  onEditAvailability,
 }) => {
   return (
     <div className="card border-dark" style={{ width: "18rem" }}>
@@ -47,6 +49,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           className="card-link px-3"
           data-bs-toggle="modal"
           data-bs-target="#viewCalendarAdmin"
+          onClick={onEditAvailability}
         >
           Edit my availability
         </a>
