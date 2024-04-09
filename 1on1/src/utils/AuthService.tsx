@@ -99,6 +99,11 @@ const AuthProvider = ({ children }: any) => {
   };
 
   const refreshToken = async () => {
+
+    if (token === null || refresh === null) {
+      return false;
+    }
+
     try {
       const response = await fetch(`${host}/accounts/token/refresh/`, {
         method: "POST",
@@ -110,14 +115,14 @@ const AuthProvider = ({ children }: any) => {
       });
       if (response.status === 401) {
         return false;
-      } else {
-        if (!response.ok) {
+      } else if (!response.ok) {
           throw new Error(await response.text());
         } else {
-          console.log(await response.json());
+          const data = await response.json();
+          setToken(data.access);
+          setLocalStorage("token", data.access)
           return true;
         }
-      }
     } catch (error) {
       console.error("Token refresh failed", error);
     }
