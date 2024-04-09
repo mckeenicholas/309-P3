@@ -42,10 +42,10 @@ interface NonBusyTime {
 
 // a datatype that represents a participants.
 interface Participant {
-	name: string;
-	email: string;
+  name: string;
+  email: string;
   username: string;
-	isAccepted: boolean;
+  isAccepted: boolean;
 }
 
 const DashboardPage: React.FC = () => {
@@ -54,12 +54,6 @@ const DashboardPage: React.FC = () => {
   const apiFetch = useRequest();
 
   useEffect(() => {
-    const fetchCalendars = async () => {
-      const response = await apiFetch('calendars/', { method: "GET" });
-      if (response) {
-        setCalendars(response);
-      }
-    };
 
     const fetchPendingInvitations = async () => {
       const response = await apiFetch('/calendars/invitations/pending', { method: "GET" });
@@ -119,33 +113,33 @@ const DashboardPage: React.FC = () => {
 
   // View participants modal
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
-	const openParticipantsModal = () => setIsParticipantsModalOpen(true);
-	const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
-	const handleRemind = async (participant: Participant) => {
-		// code for reminding a user to accept their invitation
-		console.log(`Reminding ${participant.name}...`);
-		//replace sendRequest with apiFetch
-		const apiResponse = await apiFetch(`calendars/send-email/`, {
-			method: "POST",
-			body: JSON.stringify({
-				username: participant.username
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		console.log(apiResponse);
-	};
-	const getParticipants = () => {
-		// get participants for your calendar here.
-		const participant1: Participant = { name: 'Ali O', email: 'ali@gmail.com', username: 'username', isAccepted: false };
-		const participant2: Participant = { name: 'John Hah Bob sir johnson the 3rd', email: 'hehe@gmail.com', username: 'username', isAccepted: true };
+  const openParticipantsModal = () => setIsParticipantsModalOpen(true);
+  const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
+  const handleRemind = async (participant: Participant) => {
+    // code for reminding a user to accept their invitation
+    console.log(`Reminding ${participant.name}...`);
+    //replace sendRequest with apiFetch
+    const apiResponse = await apiFetch(`calendars/send-email/`, {
+      method: "POST",
+      body: JSON.stringify({
+        username: participant.username
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log(apiResponse);
+  };
+  const getParticipants = () => {
+    // get participants for your calendar here.
+    const participant1: Participant = { name: 'Ali O', email: 'ali@gmail.com', username: 'username', isAccepted: false };
+    const participant2: Participant = { name: 'John Hah Bob sir johnson the 3rd', email: 'hehe@gmail.com', username: 'username', isAccepted: true };
 
-		const participants = [participant1, participant2];
+    const participants = [participant1, participant2];
 
-		//return list of participants.
-		return participants;
-	}
+    //return list of participants.
+    return participants;
+  }
 
 
 
@@ -409,21 +403,21 @@ const DashboardPage: React.FC = () => {
         <DashNavbar onToggleSidebar={toggleSidebar} />
 
         <div>
-        {pendingInvitations.map(invite => (
-          <PendingInvites
-            key={invite.id}
-            id={invite.id}
-            cardTitle={invite.calendar.name}
-            date={invite.date}
-            time={invite.time}
-            onAccept={() => onAccept(invite.id)}
-            onDecline={() => onDecline(invite.id)}
-          />
-        ))}
-      </div>
+          {pendingInvitations.map(invite => (
+            <PendingInvites
+              key={invite.id}
+              id={invite.id}
+              cardTitle={invite.calendar.name}
+              date={invite.date}
+              time={invite.time}
+              onAccept={() => onAccept(invite.id)}
+              onDecline={() => onDecline(invite.id)}
+            />
+          ))}
+        </div>
 
         <div className="container flex-wrap">
-          <h3 className="text-left fw-bold mt-3">My Calendars</h3>
+          <h3 className="text-left fw-bold mt-3">Calendars</h3>
           <button type="button" className="btn btn-outline-success mt-3" onClick={() => openModal()}>
             Create Calendar
           </button>

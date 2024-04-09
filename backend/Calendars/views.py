@@ -18,8 +18,9 @@ class CalendarAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Get all calendars for user
-        calendars = Calendar.objects.filter(owner=request.user)
+        # Get all calendars the user is a participant of
+        participant_calendars = CalendarParticipant.objects.filter(user=request.user)
+        calendars = [participant.calendar for participant in participant_calendars]
         serializer = CalendarReadSerializer(calendars, many=True)
         return Response(serializer.data)
 
