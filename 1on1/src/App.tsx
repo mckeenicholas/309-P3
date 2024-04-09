@@ -9,8 +9,9 @@ import Calendars from "./pages/Calendars";
 import LogInPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import Contacts from "./pages/Contacts";
-import AuthProvider from "./utils/AuthService";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
+import AuthProvider from "./utils/AuthService";
 
 const App = () => {
   return (
@@ -27,7 +28,8 @@ const App = () => {
           </Route>
           <Route path="dashboard/" element={<Calendars />} />
           <Route path="contacts/" element={<Contacts />} />
-          <Route path='*' element={<NotFound />}/>
+          <Route path="settings/" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

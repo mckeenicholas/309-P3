@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import AuthRedirect from "../utils/AuthRedirect";
 
 const Home = () => {
   return (
     <div className="flex-wrapper" style={{ height: "100%" }}>
+      <AuthRedirect redirectPath="/dashboard" />
       <NavBar />
       <div className="container my-5">
         <div className="p-5 bg-body-tertiary rounded-4">

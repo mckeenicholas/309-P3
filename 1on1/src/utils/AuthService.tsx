@@ -11,16 +11,20 @@ const getLocalStorage = (key: string) => {
 
 interface IAuthContext {
   token: string | null;
+  refresh: string | null;
   userId: string | null;
   logIn: (username: string, password: string) => Promise<boolean>;
   logOut: () => void;
+  refreshToken: () => void;
 }
 
 const AuthContext = React.createContext<IAuthContext>({
   token: null,
+  refresh: null,
   userId: null,
   logIn: async () => false,
   logOut: async () => {},
+  refreshToken: async () => false,
 });
 
 const AuthProvider = ({ children }: any) => {
@@ -67,8 +71,6 @@ const AuthProvider = ({ children }: any) => {
   };
 
   const logOut = async () => {
-    console.log("test");
-
     try {
       const response = await fetch(`${host}/accounts/logout/`, {
         method: "POST",
@@ -96,11 +98,38 @@ const AuthProvider = ({ children }: any) => {
     return true;
   };
 
+  const refreshToken = async () => {
+    try {
+      const response = await fetch(`${host}/accounts/token/refresh/`, {
+        method: "POST",
+        body: JSON.stringify({ refresh: refresh }),
+        headers: new Headers({
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }),
+      });
+      if (response.status === 401) {
+        return false;
+      } else {
+        if (!response.ok) {
+          throw new Error(await response.text());
+        } else {
+          console.log(await response.json());
+          return true;
+        }
+      }
+    } catch (error) {
+      console.error("Token refresh failed", error);
+    }
+  };
+
   const value = {
     token,
+    refresh,
     userId,
     logIn,
     logOut,
+    refreshToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

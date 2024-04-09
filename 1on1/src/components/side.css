@@ -1,5 +1,5 @@
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   background-color: #f4f4f4;
   color: #333;
 }
@@ -34,7 +34,6 @@ body {
 
 #wrapper {
   overflow-x: hidden;
-  
 }
 
 #sidebar-wrapper {
@@ -118,7 +117,7 @@ body {
 }
 
 #calendar td:hover:not(.empty-day),
-#calendar .selected-day, 
+#calendar .selected-day,
 .day-container > .day > .time-slots td:hover,
 .day-container > .day > .time-slots .selected-time {
   background-color: #4ff39c;
@@ -129,7 +128,7 @@ body {
   height: 35vh; /* This creates a space of the height of the viewport */
 }
 #spacer-2 {
-  height:0.5rem;
+  height: 0.5rem;
 }
 
 /* Time selection */

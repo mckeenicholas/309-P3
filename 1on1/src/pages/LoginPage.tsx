@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { useAuth } from "../utils/AuthService";
 import React from "react";
+import AuthRedirect from "../utils/AuthRedirect";
 
 const LogInPage = () => {
   const [username, setUsername] = React.useState<string>("");
@@ -34,6 +35,7 @@ const LogInPage = () => {
 
   return (
     <div className="flex-wrapper" style={{ height: "100%" }}>
+      <AuthRedirect redirectPath="/dashboard" />
       <NavBar showLogin={false} />
       <div className="container my-5 d-flex justify-content-center">
         <div className="p-5 bg-body-tertiary rounded-4 d-md-flex flex-column">

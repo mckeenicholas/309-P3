@@ -2,6 +2,7 @@ import React from "react";
 import NavBar from "../components/NavBar";
 import host from "../utils/links";
 import { useNavigate } from "react-router-dom";
+import AuthRedirect from "../utils/AuthRedirect";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -136,6 +137,7 @@ const SignupPage = () => {
 
   return (
     <div className="flex-wrapper" style={{ height: "100%" }}>
+      <AuthRedirect redirectPath="/dashboard" />
       <NavBar />
       <div className="container my-5 d-flex justify-content-center">
         <div className="p-5 bg-body-tertiary rounded-4 d-md-flex flex-column">
