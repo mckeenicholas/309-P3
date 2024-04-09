@@ -1,20 +1,12 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import host from "../utils/links";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthRedirect from "../utils/AuthRedirect";
+import { IFormData, userMessage } from "../utils/types";
 
 const SignupPage = () => {
   const navigate = useNavigate();
-
-  interface IFormData {
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    password1: string;
-    password2: string;
-  }
 
   const initialFormData = {
     username: "",
@@ -27,26 +19,26 @@ const SignupPage = () => {
 
   const formFields = [
     { label: "Username", id: "username", type: "text" },
-    { label: "First Name", id: "first-name", type: "text" },
-    { label: "Last Name", id: "last-name", type: "text" },
+    { label: "First Name", id: "first_name", type: "text" },
+    { label: "Last Name", id: "last_name", type: "text" },
     { label: "Email", id: "email", type: "email" },
     { label: "Password", id: "password1", type: "password" },
     { label: "Confirm Password", id: "password2", type: "password" },
   ];
 
   const [formData, setFormData] = React.useState<IFormData>(initialFormData);
-  const [hasError, setHasError] = React.useState<{
-    status: boolean;
-    message: string;
-  }>({ status: false, message: "" });
+  const [hasError, setHasError] = React.useState<userMessage>({
+    status: null,
+    message: "",
+  });
 
   const submitLoginRequest = async () => {
-    setHasError({ status: false, message: "" });
+    setHasError({ status: null, message: "" });
 
     // Check for empty fields
     if (formData.username === "" || formData.password1 === "") {
       setHasError({
-        status: true,
+        status: "error",
         message: "One or more required field(s) above is blank",
       });
       return;
@@ -58,14 +50,14 @@ const SignupPage = () => {
         /^([\w-\.!+%]+@([A-Za-z0-9-]+\.)+[\w-]{2,4})?$/.test(formData.email)
       )
     ) {
-      setHasError({ status: true, message: "Email is invalid" });
+      setHasError({ status: "error", message: "Email is invalid" });
       setFormData({ ...formData, password1: "", password2: "" });
       return;
     }
 
     if (formData.password1.length < 8) {
       setHasError({
-        status: true,
+        status: "error",
         message: "Password must be at least 8 characters",
       });
       setFormData({ ...formData, password1: "", password2: "" });
@@ -73,7 +65,7 @@ const SignupPage = () => {
     }
 
     if (formData.password1 !== formData.password2) {
-      setHasError({ status: true, message: "Passwords didn't match" });
+      setHasError({ status: "error", message: "Passwords didn't match" });
       setFormData({ ...formData, password1: "", password2: "" });
       return;
     }
@@ -96,7 +88,7 @@ const SignupPage = () => {
       const error = (await response.json()).error;
 
       setHasError({
-        status: true,
+        status: "error",
         message: Object.values(error)
           .flatMap((value) => value)
           .join(" "),
@@ -138,14 +130,20 @@ const SignupPage = () => {
   return (
     <div className="flex-wrapper" style={{ height: "100%" }}>
       <AuthRedirect redirectPath="/dashboard" />
-      <NavBar />
+      <NavBar showLogin={false} />
       <div className="container my-5 d-flex justify-content-center">
         <div className="p-5 bg-body-tertiary rounded-4 d-md-flex flex-column">
           <h2 className="text-body-emphasis text-center">Sign Up for 1on1:</h2>
+          <p className="mt-4 mb-0 text-center">
+            Already a member?{" "}
+            <Link className="text-link" to="/login">
+              Sign in!
+            </Link>
+          </p>
           <form className="my-4 d-flex flex-column">
             {renderInputs()}
             <div className="my-1"></div>
-            {hasError.status && (
+            {hasError.status === "error" && (
               <p className="text-danger">{hasError.message}</p>
             )}
             <button
