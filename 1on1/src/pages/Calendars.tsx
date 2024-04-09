@@ -109,11 +109,12 @@ const DashboardPage: React.FC = () => {
   // Finalize meeting modal
   const [currentCalendarHighPriorityTimes, setCurrentCalendarHighPriorityTimes] = useState<NonBusyTime[]>([]);
   const [currentCalendarLowPriorityTimes, setCurrentCalendarLowPriorityTimes] = useState<NonBusyTime[]>([]);
-  const [currentMeetingLength, setCurrentMeetingLength] = useState<number>(0);
+  const [currentCalendar, setCurrentCalendar] = useState<CalendarItem>({} as CalendarItem);
+  const [selectedFinalTime, setSelectedFinalTime] = useState<NonBusyTime | null>(null);
 
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
   const openFinalizeModal = async (calendar: CalendarItem) => {
-    setCurrentMeetingLength(calendar.meeting_length);
+    setCurrentCalendar(calendar);
 
     let nonbusytimes = await fetchNonBusyTimes(calendar.id, false);
     setCurrentCalendarHighPriorityTimes(nonbusytimes.filter(time => time.preference_level === 0));
@@ -122,11 +123,31 @@ const DashboardPage: React.FC = () => {
 
   };
   const closeFinalizeModal = () => setIsFinalizeModalOpen(false);
-  const saveFinalizeModal = async (selectedTime: NonBusyTime) => {
-    // Assuming the selected time is the finalized meeting time
-    // Perform the necessary logic to save the finalized meeting time
-    // Close the modal after saving
+  const saveFinalizeModal = async () => {
+    // Assuming the selected time is not null
+    // Prepare the calendar data
+    const calendarData = {
+      name: currentCalendar.name,
+      meeting_length: currentCalendar.meeting_length,
+      deadline: currentCalendar.deadline,
+      finalized_day_of_week: selectedFinalTime?.day_of_week,
+      finalized_time: selectedFinalTime?.start_time,
+    };
+
+    let apiResponse;
+    // If in edit mode and an editing calendar ID is set, update the existing calendar
+    apiResponse = await apiFetch(`calendars/${currentCalendar.id}/`, {
+      method: "PUT",
+      body: JSON.stringify(calendarData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     closeFinalizeModal();
+
+    // Refetch calendars to update UI
+    await fetchCalendars();
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -314,6 +335,28 @@ const DashboardPage: React.FC = () => {
 
   const closeEditModal = () => setIsEditModalOpen(false);
 
+  const dayOfWeekToString = (dayOfWeek: number): string => {
+    switch (dayOfWeek) {
+
+      case 0:
+        return "Monday";
+      case 1:
+        return "Tuesday";
+      case 2:
+        return "Wednesday";
+      case 3:
+        return "Thursday";
+      case 4:
+        return "Friday";
+      case 5:
+        return "Saturday";
+      case 6:
+        return "Sunday";
+      default:
+        return "";
+    }
+  }
+
   return (
     <div id="wrapper" className="d-flex">
       {isSidebarOpen && <Sidebar />}
@@ -368,9 +411,11 @@ const DashboardPage: React.FC = () => {
             isOpen={isFinalizeModalOpen}
             onClose={closeFinalizeModal}
             onSave={saveFinalizeModal}
-            meetingLength={currentMeetingLength}
+            meetingLength={currentCalendar.meeting_length}
             highPriorityTimes={currentCalendarHighPriorityTimes}
             lowPriorityTimes={currentCalendarLowPriorityTimes}
+            selectedFinalTime={selectedFinalTime}
+            setSelectedFinalTime={setSelectedFinalTime}
           />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
@@ -383,6 +428,8 @@ const DashboardPage: React.FC = () => {
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
                 onFinalize={() => openFinalizeModal(calendar)}
+                finalTime={calendar.finalized_time || ""}
+                finalDay={dayOfWeekToString(calendar.finalized_day_of_week as number)} // Add type assertion here
               />
             ))}
           </div>

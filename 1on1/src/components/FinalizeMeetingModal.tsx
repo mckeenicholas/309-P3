@@ -18,6 +18,8 @@ interface FinalizeMeetingModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (selectedTime: NonBusyTime) => void;
+    selectedFinalTime: NonBusyTime | null;
+    setSelectedFinalTime: (selectedTime: NonBusyTime) => void;
 }
 
 const findOverlap = (times: NonBusyTime[]): NonBusyTime[] => {
@@ -98,8 +100,9 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
     isOpen,
     onClose,
     onSave,
+    selectedFinalTime,
+    setSelectedFinalTime,
 }) => {
-    const [selectedTime, setSelectedTime] = useState<NonBusyTime | null>(null);
 
     if (!isOpen) return null;
 
@@ -150,7 +153,7 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
         // Find the corresponding NonBusyTime object and set it as the selected time
         const time = possibleMeetingTimes.find(t => t.id === selectedItem.id);
         if (time) {
-            setSelectedTime(time);
+            setSelectedFinalTime(time);
         }
     };
 
@@ -172,8 +175,8 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
                         <button onClick={onClose} type="button" className="btn btn-secondary">
                             Close
                         </button>
-                        <button onClick={() => selectedTime && onSave(selectedTime)}
-                            type="button" className="btn btn-primary" disabled={!selectedTime}>
+                        <button onClick={() => selectedFinalTime && onSave(selectedFinalTime)}
+                            type="button" className="btn btn-primary" disabled={!selectedFinalTime}>
                             Finalize
                         </button>
                     </div>
