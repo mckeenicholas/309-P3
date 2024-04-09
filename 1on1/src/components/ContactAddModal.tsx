@@ -7,12 +7,8 @@ interface ContactAddModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
-  fullname: string;
-  setFullname: React.Dispatch<React.SetStateAction<string>>;
   username: string;
   setUsername: React.Dispatch<React.SetStateAction<string>>;
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
   phone: string;
   setPhone: React.Dispatch<React.SetStateAction<string>>;
 }

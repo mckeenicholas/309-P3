@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CalendarAddModal.css';
-import { DayPicker } from 'react-day-picker';
 import '../styles/rdp_styles.css';
 import { format } from 'date-fns';
 import TimeSlotSelector from './TimeSlotSelector'; // Adjust the import path as necessary
@@ -11,12 +10,14 @@ interface CalendarAddModalProps {
     onSave: (selectedTimeSlots: { highPriority: string[], lowPriority: string[] }) => void;
     name: string;
     setName: React.Dispatch<React.SetStateAction<string>>;
-    selectedDays: Date[];
-    setSelectedDays: React.Dispatch<React.SetStateAction<Date[]>>;
     selectedHighPriority: string[];
     setSelectedHighPriority: React.Dispatch<React.SetStateAction<string[]>>;
     selectedLowPriority: string[];
     setSelectedLowPriority: React.Dispatch<React.SetStateAction<string[]>>;
+    meetingLength: number;
+    setMeetingLength: React.Dispatch<React.SetStateAction<number>>;
+    deadline?: Date;
+    setDeadline: React.Dispatch<React.SetStateAction<Date | undefined>>;
 }
 
 const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
@@ -25,25 +26,27 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
     onSave,
     name,
     setName,
-    selectedDays,
-    setSelectedDays,
     selectedHighPriority,
     setSelectedHighPriority,
     selectedLowPriority,
     setSelectedLowPriority,
+    meetingLength,
+    setMeetingLength,
+    deadline,
+    setDeadline,
 }) => {
-    // New state to manage the step in the modal process
     const [step, setStep] = useState<number>(1);
 
     useEffect(() => {
         if (isOpen) {
             setName('');
-            setSelectedDays([]);
+            setMeetingLength(60); // Reset meeting length
+            setDeadline(undefined); // Reset deadline
             setSelectedHighPriority([]);
             setSelectedLowPriority([]);
             setStep(1); // Reset to step 1 when modal is opened
         }
-    }, [isOpen, setName, setSelectedDays, setSelectedHighPriority, setSelectedLowPriority]);
+    }, [isOpen, setName, setMeetingLength, setDeadline, setSelectedHighPriority, setSelectedLowPriority]);
 
     if (!isOpen) return null;
 
@@ -54,14 +57,6 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
         });
     };
 
-    const footer =
-        selectedDays && selectedDays.length > 0 ? (
-            <p>You selected {selectedDays.length} day(s).</p>
-        ) : (
-            <p>Please pick one or more days.</p>
-        );
-
-    const formattedSelectedDays = selectedDays.map(day => format(day, 'yyyy-MM-dd'));
 
     return (
         <div className="modal-overlay">
@@ -69,7 +64,7 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
                 <div className="modal-content">
                     {step === 1 && (
                         <div className="modal-header">
-                            <h2>New Calendar</h2>
+                            <h2>New Calendar Setup</h2>
                         </div>
                     )}
                     <div className="modal-body">
@@ -80,26 +75,46 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
                                     <input
                                         type="text"
                                         className="form-control"
-                                        id="fullName"
-                                        name="fullName"
+                                        id="calendarName"
+                                        name="calendarName"
                                         required
                                         onChange={(e) => setName(e.target.value)}
                                         value={name}
                                     />
-                                    <div className="invalid-feedback">Name is required.</div>
                                 </div>
-                                <h5>Select days you are free:</h5>
-                                <DayPicker
-                                    mode="multiple"
-                                    selected={selectedDays}
-                                    onSelect={(value) => setSelectedDays(value as Date[])}
-                                    footer={footer}
-                                />
+                                <div className="mb-3">
+                                    <label className="form-label">Meeting Length</label>
+                                    <select
+                                        className="form-select"
+                                        id="meetingLength"
+                                        name="meetingLength"
+                                        required
+                                        onChange={(e) => setMeetingLength(parseInt(e.target.value))}
+                                        value={meetingLength}
+                                    >
+                                        <option value="15">15 minutes</option>
+                                        <option value="30">30 minutes</option>
+                                        <option value="30">45 minutes</option>
+                                        <option value="60">1 hour</option>
+                                        <option value="90">1.5 hours</option>
+                                        <option value="120">2 hours</option>
+                                    </select>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Deadline</label>
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        id="deadline"
+                                        name="deadline"
+                                        onChange={(e) => setDeadline(new Date(e.target.value))}
+                                        value={deadline ? format(deadline, 'yyyy-MM-dd') : ''}
+                                    />
+                                </div>
                             </>
                         )}
                         {step === 2 && (
                             <TimeSlotSelector
-                                days={formattedSelectedDays}
                                 startTime="09:00"
                                 endTime="17:00"
                                 interval={30}
@@ -111,19 +126,23 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
                         )}
                     </div>
                     <div className="modal-footer">
-                        {step === 1 && (
+                        {step == 1 && (
                             <>
-                                <button onClick={onClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                                <button onClick={onClose} type="button" className="btn btn-secondary">
                                     Close
                                 </button>
-                                <button onClick={() => setStep(2)} type="button" className="btn btn-primary" disabled={selectedDays.length === 0}>
+                                <button onClick={() => setStep(2)}
+                                    type="button"
+                                    className="btn btn-primary"
+                                    disabled={!name || !deadline}
+                                >
                                     Next
                                 </button>
                             </>
                         )}
-                        {step === 2 && (
+                        {step == 2 && (
                             <>
-                                <button onClick={() => setStep(1)} type="button" className="btn btn-secondary">
+                                <button onClick={() => setStep(step - 1)} type="button" className="btn btn-secondary">
                                     Back
                                 </button>
                                 <button onClick={handleSave} type="button" className="btn btn-primary">
@@ -134,7 +153,7 @@ const CalendarAddModal: React.FC<CalendarAddModalProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

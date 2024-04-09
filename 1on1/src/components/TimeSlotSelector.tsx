@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, CSSProperties } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import moment from 'moment';
 import '../styles/TimeSlotSelector.css';
 
 interface TimeSlotSelectorProps {
-    days: string[];
     startTime: string;
     endTime: string;
     interval: number;
@@ -15,11 +14,10 @@ interface TimeSlotSelectorProps {
 
 interface TimeSlot {
     time: string;
-    dateTime: string;
+    dayOfWeek: number; // Day of the week as an integer, where Monday is 0
 }
 
 const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
-    days,
     startTime,
     endTime,
     interval,
@@ -31,7 +29,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
 
     const timeSlotButtonStyle: CSSProperties = {
         display: 'block',
-        margin: '0 0',
+        margin: '0 auto',
         width: '80px',
         height: '30px',
         textAlign: 'center',
@@ -53,7 +51,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         onChangeLowPriority(selectedSlots.lowPriority);
     }, [selectedSlots, onChangeHighPriority, onChangeLowPriority]);
 
-    const generateTimeSlots = (day: string): TimeSlot[] => {
+    const generateTimeSlots = (dayOfWeek: number): TimeSlot[] => {
         const slots: TimeSlot[] = [];
         let currentTime = moment(startTime, 'HH:mm');
         const end = moment(endTime, 'HH:mm');
@@ -61,7 +59,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         while (currentTime.isBefore(end)) {
             slots.push({
                 time: currentTime.format('HH:mm'),
-                dateTime: moment(day).format('YYYY-MM-DD') + 'T' + currentTime.format('HH:mm'),
+                dayOfWeek: dayOfWeek,
             });
             currentTime.add(interval, 'minutes');
         }
@@ -69,15 +67,15 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         return slots;
     };
 
-    const handleMouseDown = (e: React.MouseEvent, dateTime: string) => {
+    const handleMouseDown = (e: React.MouseEvent, time: string, dayOfWeek: number) => {
         e.preventDefault(); // Prevent text selection
         setIsDragging(true);
-        toggleSlotSelection(dateTime);
+        toggleSlotSelection(`${dayOfWeek}-${time}`);
     };
 
-    const handleMouseEnter = (dateTime: string) => {
+    const handleMouseEnter = (time: string, dayOfWeek: number) => {
         if (isDragging) {
-            toggleSlotSelection(dateTime);
+            toggleSlotSelection(`${dayOfWeek}-${time}`);
         }
     };
 
@@ -87,26 +85,28 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         }
     };
 
-    const toggleSlotSelection = (dateTime: string): void => {
+    const toggleSlotSelection = (slotIdentifier: string): void => {
         let newSelectedSlots = { ...selectedSlots };
         const isHighPriority = prioritySelection === 'high';
         const currentPriorityList = newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'];
         const otherPriorityList = newSelectedSlots[isHighPriority ? 'lowPriority' : 'highPriority'];
 
-        const currentIndex = currentPriorityList.indexOf(dateTime);
-        const otherIndex = otherPriorityList.indexOf(dateTime);
+        const currentIndex = currentPriorityList.indexOf(slotIdentifier);
+        const otherIndex = otherPriorityList.indexOf(slotIdentifier);
 
         if (currentIndex > -1) {
-            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = currentPriorityList.filter(item => item !== dateTime);
+            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = currentPriorityList.filter(item => item !== slotIdentifier);
         } else if (otherIndex > -1) {
-            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = [...currentPriorityList, dateTime];
-            newSelectedSlots[isHighPriority ? 'lowPriority' : 'highPriority'] = otherPriorityList.filter(item => item !== dateTime);
+            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = [...currentPriorityList, slotIdentifier];
+            newSelectedSlots[isHighPriority ? 'lowPriority' : 'highPriority'] = otherPriorityList.filter(item => item !== slotIdentifier);
         } else {
-            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = [...currentPriorityList, dateTime];
+            newSelectedSlots[isHighPriority ? 'highPriority' : 'lowPriority'] = [...currentPriorityList, slotIdentifier];
         }
 
         setSelectedSlots(newSelectedSlots);
     };
+
+    const daysOfWeek = [0, 1, 2, 3, 4, 5, 6]; // Monday to Sunday
 
     return (
         <div>
@@ -115,22 +115,23 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 <option value="low">Low Priority</option>
             </select>
             <div className='day-container' onMouseUp={handleMouseUp}>
-                {days.sort().map(day => (
-                    <div key={day} style={{ width: '80px', textAlign: 'center' }}>
-                        <h5>{moment(day).format('MMM. DD')}</h5>
+                {daysOfWeek.map(dayOfWeek => (
+                    <div key={dayOfWeek} style={{ width: '80px', textAlign: 'center' }}>
+                        <h5>{moment().day(dayOfWeek + 1).format('ddd')}</h5>
                         <div>
-                            {generateTimeSlots(day).map(slot => {
+                            {generateTimeSlots(dayOfWeek).map(slot => {
+                                const slotIdentifier = `${dayOfWeek}-${slot.time}`;
                                 return (
                                     <button
-                                        key={slot.dateTime}
+                                        key={slotIdentifier}
                                         style={{
                                             ...timeSlotButtonStyle,
-                                            backgroundColor: selectedSlots.highPriority.includes(slot.dateTime) ? '#029a02' :
-                                                selectedSlots.lowPriority.includes(slot.dateTime) ? '#e5e82a' : ''
+                                            backgroundColor: selectedSlots.highPriority.includes(slotIdentifier) ? '#029a02' :
+                                                selectedSlots.lowPriority.includes(slotIdentifier) ? '#e5e82a' : ''
                                         }}
-                                        onMouseDown={(e) => handleMouseDown(e, slot.dateTime)}
+                                        onMouseDown={(e) => handleMouseDown(e, slot.time, dayOfWeek)}
                                         onContextMenu={(e) => e.preventDefault()}
-                                        onMouseEnter={() => handleMouseEnter(slot.dateTime)}
+                                        onMouseEnter={() => handleMouseEnter(slot.time, dayOfWeek)}
                                     >
                                         {slot.time}
                                     </button>

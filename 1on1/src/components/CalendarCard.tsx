@@ -6,6 +6,8 @@ interface CalendarCardProps {
   date: string;
   timeRange: string;
   responsePending: boolean;
+  allResponded: boolean; // New prop to indicate if all participants have responded
+  onEditAvailability: () => void;
 }
 
 const CalendarCard: React.FC<CalendarCardProps> = ({
@@ -13,6 +15,8 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   date,
   timeRange,
   responsePending,
+  allResponded,
+  onEditAvailability,
 }) => {
   return (
     <div className="card border-dark" style={{ width: "18rem" }}>
@@ -20,7 +24,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         src={calendarPic}
         className="card-img-top ms-2 mt-1 calendar-pic"
         alt="Calendar"
-        style={{ width: "100px", height: "auto" }} // Adjust the width as needed
+        style={{ width: "50px", height: "auto" }} // Adjust the width as needed
       />
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
@@ -36,9 +40,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           data-bs-toggle="modal"
           data-bs-target={responsePending ? "#seeResults" : "#seeResultsGreen"}
         >
-          {responsePending
-            ? "1 person has not responded"
-            : "Everybody is ready to meet!"}
+          {responsePending ? "See participants - Waiting for responses" : "See participants - All have responded"}
         </a>
       </div>
       <div className="card-body">
@@ -47,9 +49,15 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           className="card-link px-3"
           data-bs-toggle="modal"
           data-bs-target="#viewCalendarAdmin"
+          onClick={onEditAvailability}
         >
-          See Calendar
+          Edit my availability
         </a>
+      </div>
+      <div className="card-footer">
+        <button className="btn btn-primary" disabled={!allResponded}>
+          Finalize
+        </button>
       </div>
     </div>
   );

@@ -67,11 +67,15 @@
   padding: 20px 30px;
 }
 
-.list-group-item.active {
+.list-group-item:hover {
   background-color: transparent;
   color: var(--main-text-color);
   font-weight: bold;
-  border: none;
+}
+.nav-link:hover {
+  background-color: transparent;
+  color: var(--main-text-color);
+  font-weight: bold;
 }
 
 /* Adjustments for existing dashboard styles */

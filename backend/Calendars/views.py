@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
 from .models import *
 from .serializers import *
@@ -166,105 +168,6 @@ class NonBusyTimeAPIView(APIView):
         
         except NonBusyTime.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
-class MeetingAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, calendar_id):
-        # Check if user is a participant of the calendar
-        participants = CalendarParticipant.objects.filter(calendar=calendar_id, user=request.user)
-        if not participants.exists():
-            return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-        
-        # Get all meetings for the calendar
-        meetings = Meeting.objects.filter(calendar=calendar_id)
-        serializer = MeetingReadSerializer(meetings, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, calendar_id):
-        calendar = Calendar.objects.get(id=calendar_id)
-        
-        # Check if user is the owner of the calendar
-        if calendar.owner != request.user:
-            return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-        
-        serializer = MeetingWriteSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer.save(calendar=calendar)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-
-    def put(self, request, calendar_id, meeting_id):
-        try:
-            meeting = Meeting.objects.get(id=meeting_id)
-
-            # Check if user is the owner of the calendar
-            if meeting.calendar.owner != request.user:
-                return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-            
-            serializer = MeetingWriteSerializer(meeting, data=request.data)
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-            serializer.save()
-            return Response(serializer.data)
-            
-        except Meeting.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    def delete(self, request, calendar_id, meeting_id):
-        try:
-            meeting = Meeting.objects.get(id=meeting_id)
-
-            # Check if user is the owner of the calendar
-            if meeting.calendar.owner != request.user:
-                return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-            
-            meeting.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Meeting.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-class ScheduleSuggestionAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, meeting_id):
-        # Check if user is the owner of the calendar
-        meeting = Meeting.objects.get(id=meeting_id)
-        if meeting.calendar.owner != request.user:
-            return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-        
-        # Get all schedule suggestions for the meeting
-        schedule_suggestions = ScheduleSuggestion.objects.filter(meeting=meeting_id)
-        serializer = ScheduleSuggestionReadSerializer(schedule_suggestions, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, meeting_id):
-        # Check if user is the owner of the calendar
-        meeting = Meeting.objects.get(id=meeting_id)
-        if meeting.calendar.owner != request.user:
-            return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-        
-        serializer = ScheduleSuggestionWriteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(meeting=meeting)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, meeting_id, schedule_suggestion_id):
-        try:
-            schedule_suggestion = ScheduleSuggestion.objects.get(id=schedule_suggestion_id)
-            
-            # Check if user is the owner of the calendar
-            if schedule_suggestion.meeting.calendar.owner != request.user:
-                return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-            
-            schedule_suggestion.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except ScheduleSuggestion.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
         
 
 @api_view(['POST'])
@@ -338,3 +241,27 @@ class GetUserIDAPIView(APIView):
             return Response({"user_id": user.id})
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
+
+class PendingInvitationsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pending_invitations = Invitation.objects.filter(receiver=request.user, status='pending')
+        serializer = InvitationReadSerializer(pending_invitations, many=True)
+        return Response(serializer.data)
+
+
+class UpdateInvitationStatusAPIView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Invitation.objects.all()
+    serializer_class = InvitationWriteSerializer
+    lookup_field = 'id'
+
+    def patch(self, request, *args, **kwargs):
+        invitation = get_object_or_404(Invitation, id=kwargs['id'])
+        if invitation.receiver != request.user:
+            return Response({"error": "You are not authorized to update this invitation."}, status=status.HTTP_403_FORBIDDEN)
+        
+        invitation.status = request.data.get('status', invitation.status)
+        invitation.save()
+        return Response({"message": "Invitation status updated successfully."})

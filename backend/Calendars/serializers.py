@@ -34,28 +34,6 @@ class NonBusyTimeReadSerializer(serializers.ModelSerializer):
         model = NonBusyTime
         fields = '__all__'
 
-# Meeting
-class MeetingWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Meeting
-        exclude = ('calendar',)
-
-class MeetingReadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Meeting
-        fields = '__all__'
-
-# ScheduleSuggestion
-class ScheduleSuggestionWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ScheduleSuggestion
-        exclude = ('meeting',)
-
-class ScheduleSuggestionReadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ScheduleSuggestion
-        fields = '__all__'
-
 class InvitationWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation

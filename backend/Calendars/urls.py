@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import send_email, GetUserIDAPIView
+from .views import send_email, GetUserIDAPIView, PendingInvitationsAPIView, UpdateInvitationStatusAPIView
 from Calendars import views
 
 urlpatterns = [
@@ -26,23 +26,7 @@ urlpatterns = [
     path('<uuid:calendar_id>/nonbusytimes/<uuid:non_busy_time_id>/', 
          views.NonBusyTimeAPIView.as_view(), 
          name='delete_nonbusytime'),
-    
-    # Meeting
-    path('<uuid:calendar_id>/meetings/', 
-         views.MeetingAPIView.as_view(), 
-         name='meeting'),
-    path('<uuid:calendar_id>/meetings/<uuid:meeting_id>/', 
-         views.MeetingAPIView.as_view(), 
-         name='delete_or_update_meeting'),
 
-    # ScheduleSuggestion
-    path('meetings/<uuid:meeting_id>/suggestion/', 
-         views.ScheduleSuggestionAPIView.as_view(), 
-         name='suggestion'),
-    path('meetings/<uuid:meeting_id>/suggestion/<uuid:schedule_suggestion_id>/', 
-         views.ScheduleSuggestionAPIView.as_view(), 
-         name='delete_suggestion'),
-    
     # Invitations
     path('invitations/', views.InvitationAPIView.as_view(), name='invitations'),
     path('invitations/<uuid:invitation_id>/', views.InvitationAPIView.as_view(), name='delete_invitation'),
@@ -50,5 +34,8 @@ urlpatterns = [
     # Send Email
     path('send-email/', send_email, name='send_email'),
     path('get-user-id/<str:username>/', GetUserIDAPIView.as_view(), name='get_user_id'),
+    #get pending invites
+    path('invitations/pending/', PendingInvitationsAPIView.as_view(), name='pending_invitations'),
+    path('invitations/update/<uuid:id>/', views.UpdateInvitationStatusAPIView.as_view(), name='update_invitation'),
 
 ]

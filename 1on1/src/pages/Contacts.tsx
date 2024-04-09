@@ -5,6 +5,7 @@ import ContactAddModal from '../components/ContactAddModal';
 import Sidebar from '../components/Sidebar';
 import '../styles/Contacts.css'
 import useRequest from '../utils/requestHandler'
+import DashNavbar from '../components/DashNavbar';
 
 interface RawContact {
 	id: string;
@@ -27,15 +28,18 @@ interface Contact {
 
 const Contacts = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [fullname, setFullname] = React.useState<string>("");
+	// const [fullname, setFullname] = React.useState<string>("");
 	const [username, setUsername] = React.useState<string>("");
-	const [email, setEmail] = React.useState<string>("");
+	// const [email, setEmail] = React.useState<string>("");
 	const [phone, setPhone] = React.useState<string>("");
 	const [contacts, setContacts] = useState<Contact[]>([]);
 	// const [error, setError] = useState<string | null>(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 	const sendRequest = useRequest();
+
+	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 	useEffect(() => {
 		const fetchContacts = async () => {
@@ -72,11 +76,11 @@ const Contacts = () => {
 				setContacts(prev => [...prev, {
 					id: result.id,
 					email: result.contactee_info.email,
-					fullname: result.contactee_info.first_name + result.contactee_info.last_name,
+					fullname: `${result.contactee_info.first_name} ${result.contactee_info.last_name}`,
 					contactee: result.contactee
-				}])
+				}]);
 			} else {
-				alert("Failed to add contact.");
+				alert("Failed to add contact: this user does not exist");
 			}
 		} catch (error) {
 			console.error(error);
@@ -111,9 +115,10 @@ const Contacts = () => {
 	}
 
 	return (
-        <div id="wrapper" className="d-flex">
-			<Sidebar />
+		<div id="wrapper" className="d-flex">
+			{isSidebarOpen && <Sidebar />}
 			<div id="page-content-wrapper">
+				<DashNavbar onToggleSidebar={toggleSidebar} />
 				<div className="col-md-9">
 					<div className="cards-container">
 						{contacts.map(contact => (
@@ -130,27 +135,23 @@ const Contacts = () => {
 				</div>
 			</div>
 
-            <ContactAddModal
-                isOpen={isModalOpen}
+			<ContactAddModal
+				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				onSave={saveChanges}
-				fullname={fullname}
-				setFullname={setFullname}
 				username={username}
 				setUsername={setUsername}
-				email={email}
-				setEmail={setEmail}
 				phone={phone}
 				setPhone={setPhone}
-            />
-            <ContactDeleteConfirmationModal
-                isOpen={isDeleteModalOpen}
-                onClose={closeDeleteModal}
-                onConfirm={confirmDelete}
-                contactName={contactToDelete ? contactToDelete.fullname : ''}
-            />
+			/>
+			<ContactDeleteConfirmationModal
+				isOpen={isDeleteModalOpen}
+				onClose={closeDeleteModal}
+				onConfirm={confirmDelete}
+				contactName={contactToDelete ? contactToDelete.fullname : ''}
+			/>
 		</div>
-    );	
+	);
 };
 
 export default Contacts;
