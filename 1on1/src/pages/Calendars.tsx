@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import CalendarCard from "../components/CalendarCard";
 import CalendarAddModal from '../components/CalendarAddModal';
 import "../styles/Calendars.css";
-import useRequest from '../utils/requestHandler'
+import useRequest from '../utils/requestHandler';
 import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
+import PendingInvites from '../components/PendingInvites';
+
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
   id: string;
@@ -13,10 +15,72 @@ interface CalendarItem {
   deadline: string;
   finalizedDayOfWeek?: number;
   finalizedTime?: string; // Format: "HH:MM:SS"
-  // Add new fields here if you're planning to use them on the frontend
 }
-const DashboardPage = () => {
-  // Create calendars modal
+
+interface PendingInvitation {
+  id: string;
+  calendar: {
+    name: string;
+    // Add other necessary fields
+  };
+  date: string; // Example field, adjust as necessary
+  time: string; // Example field, adjust as necessary
+}
+
+const DashboardPage: React.FC = () => {
+  const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([]);
+
+  const apiFetch = useRequest();
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      const response = await apiFetch('calendars/', { method: "GET" });
+      if (response) {
+        setCalendars(response);
+      }
+    };
+
+    const fetchPendingInvitations = async () => {
+      const response = await apiFetch('/calendars/invitations/pending', { method: "GET" });
+      if (response) {
+        setPendingInvitations(response);
+      }
+    };
+
+    fetchCalendars();
+    fetchPendingInvitations();
+  }, [apiFetch]); // Combining fetch calls in a single useEffect for efficiency
+
+  const onAccept = async (invitationId: string) => {
+    const response = await apiFetch(`/calendars/invitations/update/${invitationId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: 'accepted' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (response) {
+      // Refresh calendars and invitations to reflect changes
+      setPendingInvitations(current => current.filter(invite => invite.id !== invitationId));
+      // Optionally, fetch or update the calendars list if the calendar should be added immediately upon acceptance
+    } else {
+      console.error("Failed to accept the invitation");
+    }
+  };
+
+  const onDecline = async (invitationId: string) => {
+    const response = await apiFetch(`/calendars/invitations/update/${invitationId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: 'declined' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (response) {
+      // Simply remove the invitation from the pending list
+      setPendingInvitations(current => current.filter(invite => invite.id !== invitationId));
+    } else {
+      console.error("Failed to decline the invitation");
+    }
+  }
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [name, setName] = React.useState<string>("");
   const [selectedHighPriority, setSelectedHighPriority] = useState<string[]>([]);
@@ -27,7 +91,6 @@ const DashboardPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  const apiFetch = useRequest();
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
 
   const fetchCalendars = async () => {
@@ -121,6 +184,20 @@ const DashboardPage = () => {
       <div id="page-content-wrapper">
         {/* Navbar omitted for brevity */}
         <DashNavbar onToggleSidebar={toggleSidebar} />
+
+      <div>
+      {pendingInvitations.map(invite => (
+        <PendingInvites
+          id={invite.id}
+          cardTitle={invite.calendar.name}  // Adjust according to your data structure
+          date={invite.date}
+          time={invite.time}
+          onAccept={onAccept}
+          onDecline={onDecline}
+        />
+))}
+      </div>
+
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">My Calendars</h3>
           <button type="button" className="btn btn-outline-success mt-3" onClick={openCreateModal}>Create Calendar

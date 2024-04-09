@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
 from .models import *
 from .serializers import *
@@ -239,3 +241,27 @@ class GetUserIDAPIView(APIView):
             return Response({"user_id": user.id})
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
+
+class PendingInvitationsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pending_invitations = Invitation.objects.filter(receiver=request.user, status='pending')
+        serializer = InvitationReadSerializer(pending_invitations, many=True)
+        return Response(serializer.data)
+
+
+class UpdateInvitationStatusAPIView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Invitation.objects.all()
+    serializer_class = InvitationWriteSerializer
+    lookup_field = 'id'
+
+    def patch(self, request, *args, **kwargs):
+        invitation = get_object_or_404(Invitation, id=kwargs['id'])
+        if invitation.receiver != request.user:
+            return Response({"error": "You are not authorized to update this invitation."}, status=status.HTTP_403_FORBIDDEN)
+        
+        invitation.status = request.data.get('status', invitation.status)
+        invitation.save()
+        return Response({"message": "Invitation status updated successfully."})

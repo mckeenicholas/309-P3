@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import send_email, GetUserIDAPIView
+from .views import send_email, GetUserIDAPIView, PendingInvitationsAPIView, UpdateInvitationStatusAPIView
 from Calendars import views
 
 urlpatterns = [
@@ -34,5 +34,8 @@ urlpatterns = [
     # Send Email
     path('send-email/', send_email, name='send_email'),
     path('get-user-id/<str:username>/', GetUserIDAPIView.as_view(), name='get_user_id'),
+    #get pending invites
+    path('invitations/pending/', PendingInvitationsAPIView.as_view(), name='pending_invitations'),
+    path('invitations/update/<uuid:id>/', views.UpdateInvitationStatusAPIView.as_view(), name='update_invitation'),
 
 ]
