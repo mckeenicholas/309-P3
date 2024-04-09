@@ -8,6 +8,7 @@ interface CalendarCardProps {
   responsePending: boolean;
   allResponded: boolean; // New prop to indicate if all participants have responded
   onEditAvailability: () => void;
+  onFinalize: () => void;
 }
 
 const CalendarCard: React.FC<CalendarCardProps> = ({
@@ -17,6 +18,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   responsePending,
   allResponded,
   onEditAvailability,
+  onFinalize,
 }) => {
   return (
     <div className="card border-dark" style={{ width: "18rem" }}>
@@ -55,7 +57,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         </a>
       </div>
       <div className="card-footer">
-        <button className="btn btn-primary" disabled={!allResponded}>
+        <button className="btn btn-primary" onClick={onFinalize} disabled={!allResponded}>
           Finalize
         </button>
       </div>

@@ -7,6 +7,7 @@ import useRequest from '../utils/requestHandler';
 import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
 import PendingInvites from '../components/PendingInvites';
+import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -105,6 +106,19 @@ const DashboardPage: React.FC = () => {
   const [editMode, setEditMode] = useState(false); // Determines if the modal is in create or edit mode
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null); // Tracks the ID of the calendar being edited
 
+  // Finalze meeting modal
+  const currentCalendarHighPriorityTimes: NonBusyTime[] = [];
+  const currentCalendarLowPriorityTimes: NonBusyTime[] = [];
+  const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
+  const openFinalizeModal = () => setIsFinalizeModalOpen(true);
+  const closeFinalizeModal = () => setIsFinalizeModalOpen(false);
+  const saveFinalizeModal = async (selectedTime: NonBusyTime) => {
+    // Assuming the selected time is the finalized meeting time
+    // Perform the necessary logic to save the finalized meeting time
+    // Close the modal after saving
+    closeFinalizeModal();
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -166,10 +180,7 @@ const DashboardPage: React.FC = () => {
 
       // Assuming success in updating the calendar, now delete existing non-busy times
       if (apiResponse && apiResponse.id) {
-        // Here, you would fetch and iterate over the existing non-busy times to delete them
-        // This step is abstracted since fetching existing non-busy times is not detailed in your original code
-        // Example: Assuming you have a function or a way to get these ids
-        const existingNonBusyTimes: NonBusyTime[] = []; // Replace 'ExistingNonBusyTime' with the appropriate type
+        const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(editingCalendarId, true);
         for (const nonBusyTime of existingNonBusyTimes) {
           await apiFetch(`calendars/${editingCalendarId}/nonbusytimes/${nonBusyTime.id}/`, {
             method: "DELETE",
@@ -248,23 +259,18 @@ const DashboardPage: React.FC = () => {
       // Fetch non-busy times for the calendar to be edited
       try {
         const nonBusyTimes = await fetchNonBusyTimes(calendarToEdit.id, true); // true to filter by current user
-        // Assuming nonBusyTimes are returned with enough information to distinguish between high and low priority
-        // You need to adapt this part based on how your data distinguishes between high and low priority times
         const highPriorityTimes = nonBusyTimes.filter(time => time.preference_level === 0).map(time => formatTimeForState(time));
         const lowPriorityTimes = nonBusyTimes.filter(time => time.preference_level === 1).map(time => formatTimeForState(time));
-        console.log('Hi priority times:', nonBusyTimes.filter(time => time.preference_level === 0).map(time => formatTimeForState(time)));
 
         setSelectedHighPriority(highPriorityTimes);
         setSelectedLowPriority(lowPriorityTimes);
       } catch (error) {
         console.error('Error fetching non-busy times:', error);
-        // Handle the error appropriately
       }
 
-      setIsEditModalOpen(true); // Assuming this is the correct state variable for opening the modal in edit mode
+      setIsEditModalOpen(true);
 
     } else {
-      // Reset state for creating a new calendar
       resetCreateModalState();
     }
   };
@@ -349,6 +355,14 @@ const DashboardPage: React.FC = () => {
             selectedLowPriority={selectedLowPriority}
             setSelectedLowPriority={setSelectedLowPriority}
           />
+          <FinalizeMeetingModal
+            isOpen={isFinalizeModalOpen}
+            onClose={closeFinalizeModal}
+            onSave={saveFinalizeModal}
+            meetingLength={meetingLength}
+            highPriorityTimes={currentCalendarHighPriorityTimes}
+            lowPriorityTimes={currentCalendarLowPriorityTimes}
+          />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
@@ -359,6 +373,7 @@ const DashboardPage: React.FC = () => {
                 responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
+                onFinalize={openFinalizeModal}
               />
             ))}
           </div>
