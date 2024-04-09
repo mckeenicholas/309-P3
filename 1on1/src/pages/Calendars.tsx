@@ -115,7 +115,7 @@ const DashboardPage: React.FC = () => {
   const openFinalizeModal = async (calendar: CalendarItem) => {
     setCurrentMeetingLength(calendar.meeting_length);
 
-    let nonbusytimes = await fetchNonBusyTimes(calendar.id, true);
+    let nonbusytimes = await fetchNonBusyTimes(calendar.id, false);
     setCurrentCalendarHighPriorityTimes(nonbusytimes.filter(time => time.preference_level === 0));
     setCurrentCalendarLowPriorityTimes(nonbusytimes.filter(time => time.preference_level === 1));
     setIsFinalizeModalOpen(true);
@@ -167,8 +167,6 @@ const DashboardPage: React.FC = () => {
     });
   };
   const saveChanges = async () => {
-    // Close the create calendar modal
-    closeCreateModal();
 
     // Prepare the calendar data
     const calendarData = {
@@ -311,6 +309,7 @@ const DashboardPage: React.FC = () => {
   const createCalendar = async () => {
     await saveChanges();
     closeCreateModal();
+    closeEditModal();
   };
 
   const closeEditModal = () => setIsEditModalOpen(false);

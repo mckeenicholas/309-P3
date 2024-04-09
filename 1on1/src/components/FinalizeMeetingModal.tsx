@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SelectableList from './SelectableList';
 
 interface NonBusyTime {
     id: string;
@@ -139,6 +140,20 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
         }
     }
 
+    // Convert possible meeting times to a format suitable for the SelectableList component
+    const listItems = possibleMeetingTimes.map(time => ({
+        id: time.id,
+        label: `Day: ${dayOfWeekToString(time.day_of_week)}, Start: ${time.start_time}`,
+    }));
+
+    const handleSelect = (selectedItem: { id: string; label: string }) => {
+        // Find the corresponding NonBusyTime object and set it as the selected time
+        const time = possibleMeetingTimes.find(t => t.id === selectedItem.id);
+        if (time) {
+            setSelectedTime(time);
+        }
+    };
+
     return (
         <div className="modal-overlay">
             <div className="modal-fit">
@@ -147,32 +162,24 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
                         <h2>Pick a meeting time</h2>
                     </div>
                     <div className="modal-body">
-                        <div style={{ display: isOpen ? 'block' : 'none' }}>
-                            <div>
-                                {possibleMeetingTimes.length > 0 ? (
-                                    possibleMeetingTimes.map((time) => (
-                                        <div key={time.id} onClick={() => setSelectedTime(time)}>
-                                            Day: {dayOfWeekToString(time.day_of_week)}, Start: {time.start_time}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>No possible meeting times found.</p>
-                                )}
-                            </div>
-                        </div>
+                        {listItems.length > 0 ? (
+                            <SelectableList items={listItems} onSelect={handleSelect} />
+                        ) : (
+                            <p>No possible meeting times found.</p>
+                        )}
                     </div>
                     <div className="modal-footer">
                         <button onClick={onClose} type="button" className="btn btn-secondary">
                             Close
                         </button>
                         <button onClick={() => selectedTime && onSave(selectedTime)}
-                            type="button" className="btn btn-primary" disabled={possibleMeetingTimes.length == 0}>
+                            type="button" className="btn btn-primary" disabled={!selectedTime}>
                             Finalize
                         </button>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
