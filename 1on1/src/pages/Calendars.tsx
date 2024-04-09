@@ -7,6 +7,7 @@ import useRequest from '../utils/requestHandler';
 import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
 import PendingInvites from '../components/PendingInvites';
+import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -104,6 +105,19 @@ const DashboardPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false); // Determines if the modal is in create or edit mode
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null); // Tracks the ID of the calendar being edited
+
+  // Finalze meeting modal
+  const currentCalendarHighPriorityTimes: NonBusyTime[] = [];
+  const currentCalendarLowPriorityTimes: NonBusyTime[] = [];
+  const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
+  const openFinalizeModal = () => setIsFinalizeModalOpen(true);
+  const closeFinalizeModal = () => setIsFinalizeModalOpen(false);
+  const saveFinalizeModal = async (selectedTime: NonBusyTime) => {
+    // Assuming the selected time is the finalized meeting time
+    // Perform the necessary logic to save the finalized meeting time
+    // Close the modal after saving
+    closeFinalizeModal();
+  };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -341,6 +355,14 @@ const DashboardPage: React.FC = () => {
             selectedLowPriority={selectedLowPriority}
             setSelectedLowPriority={setSelectedLowPriority}
           />
+          <FinalizeMeetingModal
+            isOpen={isFinalizeModalOpen}
+            onClose={closeFinalizeModal}
+            onSave={saveFinalizeModal}
+            meetingLength={meetingLength}
+            highPriorityTimes={currentCalendarHighPriorityTimes}
+            lowPriorityTimes={currentCalendarLowPriorityTimes}
+          />
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
@@ -351,6 +373,7 @@ const DashboardPage: React.FC = () => {
                 responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
+                onFinalize={openFinalizeModal}
               />
             ))}
           </div>
