@@ -4,7 +4,7 @@ import calendarPic from "/calendar.png"; // Adjust the path as necessary
 interface CalendarCardProps {
   title: string;
   date: string;
-  timeRange: string;
+  timeRange: number;
   responsePending: boolean;
   allResponded: boolean; // New prop to indicate if all participants have responded
   onEditAvailability: () => void;

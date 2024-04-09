@@ -13,7 +13,7 @@ import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
 interface CalendarItem {
   id: string;
   name: string;
-  meeting_length: string;
+  meeting_length: number;
   deadline: string;
   finalized_day_of_week?: number;
   finalized_time?: string; // Format: "HH:MM:SS"
@@ -106,11 +106,21 @@ const DashboardPage: React.FC = () => {
   const [editMode, setEditMode] = useState(false); // Determines if the modal is in create or edit mode
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null); // Tracks the ID of the calendar being edited
 
-  // Finalze meeting modal
-  const currentCalendarHighPriorityTimes: NonBusyTime[] = [];
-  const currentCalendarLowPriorityTimes: NonBusyTime[] = [];
+  // Finalize meeting modal
+  const [currentCalendarHighPriorityTimes, setCurrentCalendarHighPriorityTimes] = useState<NonBusyTime[]>([]);
+  const [currentCalendarLowPriorityTimes, setCurrentCalendarLowPriorityTimes] = useState<NonBusyTime[]>([]);
+  const [currentMeetingLength, setCurrentMeetingLength] = useState<number>(0);
+
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
-  const openFinalizeModal = () => setIsFinalizeModalOpen(true);
+  const openFinalizeModal = async (calendar: CalendarItem) => {
+    setCurrentMeetingLength(calendar.meeting_length);
+
+    let nonbusytimes = await fetchNonBusyTimes(calendar.id, true);
+    setCurrentCalendarHighPriorityTimes(nonbusytimes.filter(time => time.preference_level === 0));
+    setCurrentCalendarLowPriorityTimes(nonbusytimes.filter(time => time.preference_level === 1));
+    setIsFinalizeModalOpen(true);
+
+  };
   const closeFinalizeModal = () => setIsFinalizeModalOpen(false);
   const saveFinalizeModal = async (selectedTime: NonBusyTime) => {
     // Assuming the selected time is the finalized meeting time
@@ -251,7 +261,7 @@ const DashboardPage: React.FC = () => {
     if (calendarToEdit) {
       // Populate state with the data of the calendar being edited
       setName(calendarToEdit.name);
-      setMeetingLength(parseInt(calendarToEdit.meeting_length, 10));
+      setMeetingLength(calendarToEdit.meeting_length);
       setDeadline(new Date(calendarToEdit.deadline));
       setEditingCalendarId(calendarToEdit.id);
       setEditMode(true);
@@ -359,7 +369,7 @@ const DashboardPage: React.FC = () => {
             isOpen={isFinalizeModalOpen}
             onClose={closeFinalizeModal}
             onSave={saveFinalizeModal}
-            meetingLength={meetingLength}
+            meetingLength={currentMeetingLength}
             highPriorityTimes={currentCalendarHighPriorityTimes}
             lowPriorityTimes={currentCalendarLowPriorityTimes}
           />
@@ -373,7 +383,7 @@ const DashboardPage: React.FC = () => {
                 responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
-                onFinalize={openFinalizeModal}
+                onFinalize={() => openFinalizeModal(calendar)}
               />
             ))}
           </div>
