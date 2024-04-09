@@ -8,6 +8,7 @@ import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
 import PendingInvites from '../components/PendingInvites';
 import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
+import ParticipantsModal from '../components/ParticipantsModal';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -37,6 +38,14 @@ interface NonBusyTime {
   start_time: string;
   end_time: string;
   preference_level: number;
+}
+
+// a datatype that represents a participants.
+interface Participant {
+	name: string;
+	email: string;
+  username: string;
+	isAccepted: boolean;
 }
 
 const DashboardPage: React.FC = () => {
@@ -106,6 +115,39 @@ const DashboardPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false); // Determines if the modal is in create or edit mode
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null); // Tracks the ID of the calendar being edited
+
+
+  // View participants modal
+  const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
+	const openParticipantsModal = () => setIsParticipantsModalOpen(true);
+	const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
+	const handleRemind = async (participant: Participant) => {
+		// code for reminding a user to accept their invitation
+		console.log(`Reminding ${participant.name}...`);
+		//replace sendRequest with apiFetch
+		const apiResponse = await apiFetch(`calendars/send-email/`, {
+			method: "POST",
+			body: JSON.stringify({
+				username: participant.username
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		console.log(apiResponse);
+	};
+	const getParticipants = () => {
+		// get participants for your calendar here.
+		const participant1: Participant = { name: 'Ali O', email: 'ali@gmail.com', username: 'username', isAccepted: false };
+		const participant2: Participant = { name: 'John Hah Bob sir johnson the 3rd', email: 'hehe@gmail.com', username: 'username', isAccepted: true };
+
+		const participants = [participant1, participant2];
+
+		//return list of participants.
+		return participants;
+	}
+
+
 
   // Finalize meeting modal
   const [currentCalendarHighPriorityTimes, setCurrentCalendarHighPriorityTimes] = useState<NonBusyTime[]>([]);
@@ -419,6 +461,18 @@ const DashboardPage: React.FC = () => {
             selectedFinalTime={selectedFinalTime}
             setSelectedFinalTime={setSelectedFinalTime}
           />
+
+          <ParticipantsModal
+            isOpen={isParticipantsModalOpen}
+            onClose={closeParticipantsModal}
+            onRemind={handleRemind}
+            // call getParticipants here for your specific calendar.
+            participants={getParticipants()}
+          />
+          {/* Button below for opening a modal that shows participants*/}
+          {/* <button className="view-participants-btn btn btn-outline-success mt-5" onClick={openParticipantsModal}>View Participants</button> */}
+
+
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
