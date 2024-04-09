@@ -71,9 +71,10 @@ const DashboardPage: React.FC = () => {
     });
 
     if (response) {
-      // Refresh calendars and invitations to reflect changes
+      // Remove the invitation from the pending list
       setPendingInvitations(current => current.filter(invite => invite.id !== invitationId));
-      // Optionally, fetch or update the calendars list if the calendar should be added immediately upon acceptance
+      // Fetch calendars to update the "My Calendars" section with the newly accepted calendar
+      fetchCalendars();
     } else {
       console.error("Failed to accept the invitation");
     }
@@ -366,17 +367,18 @@ const DashboardPage: React.FC = () => {
         <DashNavbar onToggleSidebar={toggleSidebar} />
 
         <div>
-          {pendingInvitations.map(invite => (
-            <PendingInvites
-              id={invite.id}
-              cardTitle={invite.calendar.name}  // Adjust according to your data structure
-              date={invite.date}
-              time={invite.time}
-              onAccept={onAccept}
-              onDecline={onDecline}
-            />
-          ))}
-        </div>
+        {pendingInvitations.map(invite => (
+          <PendingInvites
+            key={invite.id}
+            id={invite.id}
+            cardTitle={invite.calendar.name}
+            date={invite.date}
+            time={invite.time}
+            onAccept={() => onAccept(invite.id)}
+            onDecline={() => onDecline(invite.id)}
+          />
+        ))}
+      </div>
 
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">My Calendars</h3>

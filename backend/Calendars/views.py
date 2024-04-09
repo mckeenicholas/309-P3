@@ -262,6 +262,14 @@ class UpdateInvitationStatusAPIView(generics.UpdateAPIView):
         if invitation.receiver != request.user:
             return Response({"error": "You are not authorized to update this invitation."}, status=status.HTTP_403_FORBIDDEN)
         
-        invitation.status = request.data.get('status', invitation.status)
+        status = request.data.get('status', invitation.status)
+        invitation.status = status
         invitation.save()
+        
+        if status == 'accepted':
+            # Check if the user is already a participant of the calendar
+            if not CalendarParticipant.objects.filter(calendar=invitation.calendar, user=request.user).exists():
+                # Add the user as a participant of the calendar
+                CalendarParticipant.objects.create(calendar=invitation.calendar, user=request.user)
+        
         return Response({"message": "Invitation status updated successfully."})
