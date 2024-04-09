@@ -166,10 +166,7 @@ const DashboardPage: React.FC = () => {
 
       // Assuming success in updating the calendar, now delete existing non-busy times
       if (apiResponse && apiResponse.id) {
-        // Here, you would fetch and iterate over the existing non-busy times to delete them
-        // This step is abstracted since fetching existing non-busy times is not detailed in your original code
-        // Example: Assuming you have a function or a way to get these ids
-        const existingNonBusyTimes: NonBusyTime[] = []; // Replace 'ExistingNonBusyTime' with the appropriate type
+        const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(editingCalendarId, true);
         for (const nonBusyTime of existingNonBusyTimes) {
           await apiFetch(`calendars/${editingCalendarId}/nonbusytimes/${nonBusyTime.id}/`, {
             method: "DELETE",
@@ -248,23 +245,18 @@ const DashboardPage: React.FC = () => {
       // Fetch non-busy times for the calendar to be edited
       try {
         const nonBusyTimes = await fetchNonBusyTimes(calendarToEdit.id, true); // true to filter by current user
-        // Assuming nonBusyTimes are returned with enough information to distinguish between high and low priority
-        // You need to adapt this part based on how your data distinguishes between high and low priority times
         const highPriorityTimes = nonBusyTimes.filter(time => time.preference_level === 0).map(time => formatTimeForState(time));
         const lowPriorityTimes = nonBusyTimes.filter(time => time.preference_level === 1).map(time => formatTimeForState(time));
-        console.log('Hi priority times:', nonBusyTimes.filter(time => time.preference_level === 0).map(time => formatTimeForState(time)));
 
         setSelectedHighPriority(highPriorityTimes);
         setSelectedLowPriority(lowPriorityTimes);
       } catch (error) {
         console.error('Error fetching non-busy times:', error);
-        // Handle the error appropriately
       }
 
-      setIsEditModalOpen(true); // Assuming this is the correct state variable for opening the modal in edit mode
+      setIsEditModalOpen(true);
 
     } else {
-      // Reset state for creating a new calendar
       resetCreateModalState();
     }
   };
