@@ -333,40 +333,40 @@ const DashboardPage: React.FC = () => {
       deadline: deadline?.toISOString(),
     };
 
-    let apiResponse;
-    if (editMode && editingCalendarId) {
+    if (editMode) {
       // If in edit mode and an editing calendar ID is set, update the existing calendar
-      apiResponse = await apiFetch(`calendars/${editingCalendarId}/`, {
-        method: "PUT",
-        body: JSON.stringify(calendarData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // apiResponse = await apiFetch(`calendars/${editingCalendarId}/`, {
+      //   method: "PUT",
+      //   body: JSON.stringify(calendarData),
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
 
       // Assuming success in updating the calendar, now delete existing non-busy times
-      if (apiResponse && apiResponse.id) {
-        const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(
-          editingCalendarId,
-          true,
-        );
-        await Promise.all(
-          existingNonBusyTimes.map(async (nonBusyTime) => {
-            await apiFetch(
-              `calendars/${editingCalendarId}/nonbusytimes/${nonBusyTime.id}/`,
-              {
-                method: "DELETE",
-              },
-            );
-          }),
-        );
-      } else {
-        console.error("Failed to update calendar");
-        return;
-      }
+      // if (apiResponse && apiResponse.id) {
+      const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(
+        currentCalendar.id,
+        true,
+      );
+      await Promise.all(
+        existingNonBusyTimes.map(async (nonBusyTime) => {
+          await apiFetch(
+            `calendars/${currentCalendar.id}/nonbusytimes/${nonBusyTime.id}/`,
+            {
+              method: "DELETE",
+            },
+          );
+          console.log("Deleted non-busy time", nonBusyTime.id);
+        }),
+      );
+      // } else {
+      //   console.error("Failed to update calendar");
+      //   return;
+      // }
     } else {
       // If not in edit mode, create a new calendar
-      apiResponse = await apiFetch("calendars/", {
+      let apiResponse = await apiFetch("calendars/", {
         method: "POST",
         body: JSON.stringify(calendarData),
         headers: {
@@ -390,13 +390,14 @@ const DashboardPage: React.FC = () => {
     // Add each non-busy time to the calendar
     await Promise.all(
       nonBusyTimes.map(async (time) => {
-        await apiFetch(`calendars/${apiResponse.id}/nonbusytimes/`, {
+        await apiFetch(`calendars/${currentCalendar.id}/nonbusytimes/`, {
           method: "POST",
           body: JSON.stringify(time),
           headers: {
             "Content-Type": "application/json",
           },
         });
+        console.log("Created non-busy time", time);
       }),
     );
 
@@ -424,7 +425,7 @@ const DashboardPage: React.FC = () => {
       await Promise.all(
         nonBusyTimes.map(async (time: any) => {
           await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
-            method: "POST",
+            method: "GET",
             body: JSON.stringify(time),
             headers: {
               "Content-Type": "application/json",
@@ -442,6 +443,7 @@ const DashboardPage: React.FC = () => {
 
   const openModal = async (calendarToEdit?: CalendarItem) => {
     if (calendarToEdit) {
+      setCurrentCalendar(calendarToEdit);
       // Populate state with the data of the calendar being edited
       setName(calendarToEdit.name);
       setMeetingLength(calendarToEdit.meeting_length);
@@ -459,6 +461,8 @@ const DashboardPage: React.FC = () => {
           .filter((time) => time.preference_level === 1)
           .map((time) => formatTimeForState(time));
 
+        console.log("High priority times:", highPriorityTimes);
+        console.log("Low priority times:", lowPriorityTimes);
         setSelectedHighPriority(highPriorityTimes);
         setSelectedLowPriority(lowPriorityTimes);
       } catch (error) {
