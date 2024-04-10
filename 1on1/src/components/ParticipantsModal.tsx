@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useRequest from '../utils/requestHandler';
 import '../styles/ParticipantsModal.css';
 
 interface Participant {
@@ -7,25 +8,76 @@ interface Participant {
   isAccepted: boolean;
 }
 
+interface Contact {
+  id: string;
+  email: string;
+  fullname: string;
+  contactee: number;
+}
+
 interface ParticipantsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRemind: (participant: Participant) => void;
   participants: Participant[];
+  isOwner: boolean;
+  userContacts: Contact[];
+  currentCalendarId: string;
 }
 
-const ParticipantsModal: React.FC<ParticipantsModalProps> = ({ isOpen, onClose, onRemind, participants }) => {
+const ParticipantsModal: React.FC<ParticipantsModalProps> = ({
+  isOpen,
+  onClose,
+  onRemind,
+  participants,
+  isOwner,
+  userContacts,
+  currentCalendarId
+}) => {
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [remindedParticipants, setRemindedParticipants] = useState<string[]>([]);
+  const sendRequest = useRequest(); // Replace with your actual API request function
 
   const handleRemind = (participant: Participant) => {
     onRemind(participant);
-    setRemindedParticipants((prev: string[]) => [...prev, participant.email]);
+    setRemindedParticipants((prev) => [...prev, participant.email]);
   };
 
+  const handleInvite = async () => {
+    console.log(selectedContactId)
+    if (selectedContactId && currentCalendarId) {
+      // Find the contact object based on the selectedContactId
+      const selectedContact = userContacts.find(contact => contact.id === selectedContactId);
+      console.log(selectedContactId)
+      if (!selectedContact) {
+        console.error('Selected contact not found');
+        return;
+      }
+      
+      try {
+        await sendRequest(`/calendars/invitations/`, {
+          method: 'POST',
+          body: JSON.stringify({
+            calendar_id: currentCalendarId,
+            receiver_id: selectedContact.contactee, // Use contactee number as receiver_id
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        // Add logic to handle successful invitation
+        setSelectedContactId(null); // Reset the selection
+      } catch (error) {
+        console.error('Failed to send invitation', error);
+      }
+    }
+};
+
   const handleClose = () => {
+    setSelectedContactId(null);
     setRemindedParticipants([]);
     onClose();
-  }
+  };
 
   if (!isOpen) return null;
 
@@ -65,6 +117,34 @@ const ParticipantsModal: React.FC<ParticipantsModalProps> = ({ isOpen, onClose, 
                 </div>
               ))}
             </div>
+            {isOwner && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="contact-dropdown">Select Contact</label>
+                    <select 
+                      className="form-control" 
+                      id="contact-dropdown"
+                      value={selectedContactId || ''}
+                      onChange={(e) => setSelectedContactId(e.target.value)}
+                    >
+                      <option value="">Select a contact</option>
+                      {userContacts.map(contact => (
+                        <option key={contact.id} value={contact.id}>
+                          {contact.fullname || `${contact.contactee} (No name provided)`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary"
+                    onClick={handleInvite}
+                    disabled={!selectedContactId}
+                  >
+                    Invite User
+                  </button>
+                </>
+              )}
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
             </div>

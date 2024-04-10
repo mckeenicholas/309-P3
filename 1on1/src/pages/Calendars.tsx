@@ -47,8 +47,26 @@ interface Participant {
   isAccepted: boolean;
 }
 
+interface Contact {
+	id: string;
+	email: string;
+	fullname: string;
+	contactee: number;
+}
+
+interface RawContact {
+	id: string;
+	contactee: number;
+	contactee_info: {
+		email: string;
+		first_name: string;
+		last_name: string;
+	};
+}
+
 const DashboardPage: React.FC = () => {
   const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([]);
+  const [userContacts, setUserContacts] = useState<Contact[]>([]);
 
   const apiFetch = useRequest();
 
@@ -60,6 +78,26 @@ const DashboardPage: React.FC = () => {
   }
 
   useEffect(() => {
+    
+    const fetchContacts = async () => {
+      try {
+        const response = await apiFetch('/contacts/', { method: 'GET' });
+        if (response) {
+          // Transform the response using RawContact and Contact interfaces
+          const transformedContacts: Contact[] = response.map((rawContact: RawContact) => ({
+            id: rawContact.id,
+            email: rawContact.contactee_info.email,
+            fullname: `${rawContact.contactee_info.first_name} ${rawContact.contactee_info.last_name}`,
+            contactee: rawContact.contactee
+          }));
+          setUserContacts(transformedContacts);
+        }
+      } catch (error) {
+        console.error('Failed to fetch contacts', error);
+      }
+    };
+  
+    fetchContacts();
 
     const fetchPendingInvitations = async () => {
       const response = await apiFetch('/calendars/invitations/pending', { method: "GET" });
@@ -488,6 +526,10 @@ const DashboardPage: React.FC = () => {
             onRemind={handleRemind}
             // call getParticipants here for your specific calendar.
             participants={currentCalendarParticipants}
+            isOwner={currentCalendar.owner === currentUserId}
+            userContacts={userContacts} // Add user contacts here
+            //current calendar id
+            currentCalendarId={currentCalendar.id}
           />
           {/* Button below for opening a modal that shows participants*/}
           {/* <button className="view-participants-btn btn btn-outline-success mt-5" onClick={openParticipantsModal}>View Participants</button> */}
@@ -523,3 +565,5 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
+
+
