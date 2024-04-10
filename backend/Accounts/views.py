@@ -75,7 +75,7 @@ class DeleteAccount(APIView):
     def post(self, request):
         user = request.user
         
-        refresh_token = request.data.get("refresh_token")
+        refresh_token = request.data.get("refresh")
         if refresh_token is None:
             return Response({'error': 'Refresh token was not provided'}, status=status.HTTP_400_BAD_REQUEST)
 

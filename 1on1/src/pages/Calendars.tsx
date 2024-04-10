@@ -119,9 +119,6 @@ const DashboardPage: React.FC = () => {
     closeFinalizeModal();
   };
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
 
   const fetchCalendars = async () => {
@@ -307,12 +304,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div id="wrapper" className="d-flex">
-      {isSidebarOpen && <Sidebar />}
-
       <div id="page-content-wrapper">
-        {/* Navbar omitted for brevity */}
-        <DashNavbar onToggleSidebar={toggleSidebar} />
-
         <div>
           {pendingInvitations.map(invite => (
             <PendingInvites

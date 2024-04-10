@@ -1,9 +1,9 @@
-import React from "react";
+import { forwardRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useAuth } from "../utils/AuthService";
 
-const Sidebar: React.FC = () => {
+const Sidebar = forwardRef(() => {
   const { logOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,6 +71,6 @@ const Sidebar: React.FC = () => {
       </ul>
     </div>
   );
-};
+});
 
 export default Sidebar;
