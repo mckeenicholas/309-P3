@@ -5,7 +5,7 @@ import DashNavbar from "../components/DashNavbar";
 import { IFormData, userMessage } from "../utils/types";
 import host from "../utils/links";
 import { useAuth } from "../utils/AuthService";
-import { Button, Modal } from "react-bootstrap";
+import { Badge, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
@@ -209,11 +209,7 @@ const Settings = () => {
           </button>
         </Modal.Footer>
       </Modal>
-
-      {isSidebarOpen && <Sidebar />}
       <div id="page-content-wrapper">
-        {/* Navbar omitted for brevity */}
-        <DashNavbar onToggleSidebar={toggleSidebar} />
         <div className="container pt-4">
           <div className="col-md-12">
             <h2 className="fw-bold">My Account</h2>
@@ -244,7 +240,10 @@ const Settings = () => {
             <hr />
             <h5 className="fw-bold">Account Removal</h5>
             <p className="mt-2 mb-2 text-danger">
-              WARNING: Deleting your account is permenant and cannot be undone!
+              <Badge bg="danger" className="me-2">
+                Warning
+              </Badge>
+              Deleting your account is permanent and cannot be undone!
             </p>
             <button
               type="button"

@@ -38,9 +38,6 @@ const Contacts = () => {
 	const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 	const sendRequest = useRequest();
 
-	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
 	useEffect(() => {
 		const fetchContacts = async () => {
 			try {
@@ -116,9 +113,7 @@ const Contacts = () => {
 
 	return (
 		<div id="wrapper" className="d-flex">
-			{isSidebarOpen && <Sidebar />}
 			<div id="page-content-wrapper">
-				<DashNavbar onToggleSidebar={toggleSidebar} />
 				<div className="col-md-9">
 					<div className="cards-container">
 						{contacts.map(contact => (

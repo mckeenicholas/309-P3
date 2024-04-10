@@ -36,6 +36,10 @@ class EditProfileSerializer(UserSerializer):
         instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.set_password(validated_data.get('password'))
+        pw = validated_data.get('password')
+        if pw is not None:
+            instance.set_password(pw)
+        
         instance.save()
         return instance
+    

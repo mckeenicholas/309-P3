@@ -12,6 +12,7 @@ import Contacts from "./pages/Contacts";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import AuthProvider from "./utils/AuthService";
+import { DashboardOverlay } from "./components/DashboardOverlay";
 
 const App = () => {
   return (
@@ -26,9 +27,11 @@ const App = () => {
             <Route path="login/" element={<LogInPage />} />
             <Route path="signup/" element={<SignupPage />} />
           </Route>
-          <Route path="dashboard/" element={<Calendars />} />
-          <Route path="contacts/" element={<Contacts />} />
-          <Route path="settings/" element={<Settings />} />
+          <Route element={<DashboardOverlay />}>
+            <Route path="dashboard/" element={<Calendars />} />
+            <Route path="contacts/" element={<Contacts />} />
+            <Route path="settings/" element={<Settings />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
