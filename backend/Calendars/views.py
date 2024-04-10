@@ -246,9 +246,9 @@ class InvitationAPIView(APIView):
         # Check if the receiver is in the sender's contacts
         if not Contact.objects.filter(owner=request.user, contactee_id=receiver_id).exists():
             return Response({"error": "The user you are inviting is not in your contacts."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Proceed with the original logic if the check passes
-        serializer = InvitationWriteSerializer(request.user, data=request.data)
+        serializer = InvitationWriteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(sender=request.user)  # Automatically set the sender to the current user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
