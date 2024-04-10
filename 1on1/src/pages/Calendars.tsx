@@ -4,8 +4,6 @@ import CalendarAddModal from '../components/CalendarAddModal';
 import CalendarEditModal from '../components/CalendarEditModal';
 import "../styles/Calendars.css";
 import useRequest from '../utils/requestHandler';
-import Sidebar from '../components/Sidebar';
-import DashNavbar from '../components/DashNavbar';
 import PendingInvites from '../components/PendingInvites';
 import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
 import ParticipantsModal from '../components/ParticipantsModal';

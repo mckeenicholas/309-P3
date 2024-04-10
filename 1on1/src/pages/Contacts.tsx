@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Card from '../components/ContactCard';
 import ContactDeleteConfirmationModal from '../components/ContactDeleteConfirmationModal';
 import ContactAddModal from '../components/ContactAddModal';
-import Sidebar from '../components/Sidebar';
 import '../styles/Contacts.css'
 import useRequest from '../utils/requestHandler'
-import DashNavbar from '../components/DashNavbar';
 
 interface RawContact {
 	id: string;

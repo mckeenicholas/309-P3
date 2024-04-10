@@ -1,11 +1,9 @@
 import React from "react";
 import useRequest from "../utils/requestHandler";
-import Sidebar from "../components/Sidebar";
-import DashNavbar from "../components/DashNavbar";
 import { IFormData, userMessage } from "../utils/types";
 import host from "../utils/links";
 import { useAuth } from "../utils/AuthService";
-import { Badge, Button, Modal } from "react-bootstrap";
+import { Badge, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
