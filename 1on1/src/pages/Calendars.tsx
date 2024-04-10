@@ -494,8 +494,10 @@ const DashboardPage: React.FC = () => {
                 title={calendar.name}
                 date={calendar.deadline}
                 timeRange={calendar.meeting_length}
-                responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
-                allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
+                //responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
+
+                //TODO: update new allResponded by getting all participants and checking if they have responded
+                allResponded={true}
                 onEditAvailability={() => openModal(calendar)}
                 onFinalize={() => openFinalizeModal(calendar)}
                 onViewParticipants={() => openParticipantsModal(calendar)}

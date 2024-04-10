@@ -5,7 +5,7 @@ interface CalendarCardProps {
   title: string;
   date: string;
   timeRange: number;
-  responsePending: boolean;
+  //responsePending: boolean;
   allResponded: boolean; // New prop to indicate if all participants have responded
   finalTime: string; // New prop to indicate the finalized time
   finalDay: string; // New prop to indicate the finalized day
@@ -19,7 +19,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   title,
   date,
   timeRange,
-  responsePending,
+  //responsePending,
   allResponded,
   finalTime,
   finalDay,
@@ -48,10 +48,10 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           href="#"
           className="card-link px-3"
           data-bs-toggle="modal"
-          data-bs-target={responsePending ? "#seeResults" : "#seeResultsGreen"}
+          data-bs-target={allResponded ? "#seeResults" : "#seeResultsGreen"}
           onClick={onViewParticipants}
         >
-          {responsePending ? "See participants - Waiting for responses" : "See participants - All have responded"}
+          See Participants
         </a>
       </div>
       <div className="card-body">
