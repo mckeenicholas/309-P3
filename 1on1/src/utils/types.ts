@@ -16,3 +16,13 @@ export type field_names = {
   last_name: string;
   first_name: string;
 };
+
+export type Meeting = {
+  id: string;
+  name: string;
+  meeting_length: number;
+  deadline: string;
+  finalized_day_of_week: number;
+  finalized_time: string;
+  owner: number;
+};

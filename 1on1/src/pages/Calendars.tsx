@@ -7,6 +7,8 @@ import useRequest from '../utils/requestHandler';
 import PendingInvites from '../components/PendingInvites';
 import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
 import ParticipantsModal from '../components/ParticipantsModal';
+import generateCalendar from '../utils/icalGenerator';
+import { Meeting } from '../utils/types';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -483,6 +485,9 @@ const DashboardPage: React.FC = () => {
           <h3 className="text-left fw-bold mt-3">Calendars</h3>
           <button type="button" className="btn btn-outline-success mt-3" onClick={() => openModal()} style={{ marginBottom: '20px' }}>
             Create Calendar
+          </button>
+          <button type="button" className="btn btn-outline-success mt-3 ms-2" onClick={() => generateCalendar("1on1-schedule", calendars as Meeting[])} style={{ marginBottom: '20px' }}>
+            Download my Calendars
           </button>
           <CalendarAddModal
             isOpen={isCreateModalOpen}
