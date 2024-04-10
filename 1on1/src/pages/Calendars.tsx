@@ -17,6 +17,7 @@ interface CalendarItem {
   deadline: string;
   finalized_day_of_week?: number;
   finalized_time?: string; // Format: "HH:MM:SS"
+
 }
 
 interface PendingInvitation {
@@ -158,14 +159,28 @@ const DashboardPage: React.FC = () => {
   const [currentCalendarLowPriorityTimes, setCurrentCalendarLowPriorityTimes] = useState<NonBusyTime[]>([]);
   const [currentCalendar, setCurrentCalendar] = useState<CalendarItem>({} as CalendarItem);
   const [selectedFinalTime, setSelectedFinalTime] = useState<NonBusyTime | null>(null);
+  const [currentCalendarIsReady, setCurrentCalendarIsReady] = useState<boolean>(false);
 
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
 
   // Participants modal
   const [currentCalendarParticipants, setCurrentCalendarParticipants] = useState<Participant[]>([]);
 
+  const checkCalendarReady = async (calendarId: string): Promise<boolean> => {
+    const response = await apiFetch(`calendars/${calendarId}/check-calendar-ready/`, { method: "GET" });
+    if (response && response.result) {
+      return response.result;
+    }
+    return false;
+  };
+
   const openFinalizeModal = async (calendar: CalendarItem) => {
     setCurrentCalendar(calendar);
+
+
+
+    const isCalendarReady = await checkCalendarReady(calendar.id);
+    setCurrentCalendarIsReady(isCalendarReady);
 
     let nonbusytimes = await fetchNonBusyTimes(calendar.id, false);
     setCurrentCalendarHighPriorityTimes(nonbusytimes.filter(time => time.preference_level === 0));
@@ -464,6 +479,7 @@ const DashboardPage: React.FC = () => {
             lowPriorityTimes={currentCalendarLowPriorityTimes}
             selectedFinalTime={selectedFinalTime}
             setSelectedFinalTime={setSelectedFinalTime}
+            isReady={currentCalendarIsReady}
           />
 
           <ParticipantsModal

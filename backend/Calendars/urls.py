@@ -14,6 +14,7 @@ urlpatterns = [
           name='delete_or_update_calendar'),
 
      # Participants
+     path('<uuid:calendar_id>/check-calendar-ready/',views.check_non_busy_times, name='check_calendar_ready'),
      path('<uuid:calendar_id>/participants-name-email/', 
           views.get_calendar_participant_name_emails, 
           name='participants_name_email'),

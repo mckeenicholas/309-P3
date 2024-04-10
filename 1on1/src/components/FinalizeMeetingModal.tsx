@@ -20,6 +20,7 @@ interface FinalizeMeetingModalProps {
     onSave: (selectedTime: NonBusyTime) => void;
     selectedFinalTime: NonBusyTime | null;
     setSelectedFinalTime: (selectedTime: NonBusyTime) => void;
+    isReady: boolean;
 }
 
 const findOverlap = (times: NonBusyTime[]): NonBusyTime[] => {
@@ -102,6 +103,7 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
     onSave,
     selectedFinalTime,
     setSelectedFinalTime,
+    isReady,
 }) => {
 
     if (!isOpen) return null;
@@ -164,22 +166,38 @@ const FinalizeMeetingModal: React.FC<FinalizeMeetingModalProps> = ({
                     <div className="modal-header">
                         <h2>Pick a meeting time</h2>
                     </div>
-                    <div className="modal-body">
-                        {listItems.length > 0 ? (
-                            <SelectableList items={listItems} onSelect={handleSelect} />
-                        ) : (
-                            <p>No possible meeting times found.</p>
-                        )}
-                    </div>
-                    <div className="modal-footer">
-                        <button onClick={onClose} type="button" className="btn btn-secondary">
-                            Close
-                        </button>
-                        <button onClick={() => selectedFinalTime && onSave(selectedFinalTime)}
-                            type="button" className="btn btn-primary" disabled={!selectedFinalTime}>
-                            Finalize
-                        </button>
-                    </div>
+                    {isReady && (
+                        <>
+                            <div className="modal-body">
+                                {listItems.length > 0 ? (
+                                    <SelectableList items={listItems} onSelect={handleSelect} />
+                                ) : (
+                                    <p>No possible meeting times found.</p>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button onClick={onClose} type="button" className="btn btn-secondary">
+                                    Close
+                                </button>
+                                <button onClick={() => selectedFinalTime && onSave(selectedFinalTime)}
+                                    type="button" className="btn btn-primary" disabled={!selectedFinalTime}>
+                                    Finalize
+                                </button>
+                            </div>
+                        </>
+                    )}
+                    {!isReady && (
+                        <>
+                            <div className="modal-body">
+                                <p>All participants must enter their availability before you can decide a meeting time.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button onClick={onClose} type="button" className="btn btn-secondary">
+                                    Close
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

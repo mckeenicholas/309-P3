@@ -92,6 +92,21 @@ def get_calendar_participant_name_emails(request, calendar_id):
     
     return Response(participant_data)
 
+@api_view(['GET'])
+def check_non_busy_times(request, calendar_id):
+    # Check if user is a participant of the calendar
+    participants = CalendarParticipant.objects.filter(calendar=calendar_id)
+    if not participants.filter(user=request.user).exists():
+        return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if all participants have at least one non-busy time for the calendar
+    for participant in participants:
+        non_busy_times = NonBusyTime.objects.filter(calendar=calendar_id, user=participant.user)
+        if not non_busy_times.exists():
+            return Response({"result": False}, status=status.HTTP_200_OK)
+    
+    return Response({"result": True}, status=status.HTTP_200_OK)
+
 class CalendarParticipantAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
