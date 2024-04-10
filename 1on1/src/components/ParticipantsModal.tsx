@@ -58,8 +58,8 @@ const ParticipantsModal: React.FC<ParticipantsModalProps> = ({
         await sendRequest(`/calendars/invitations/`, {
           method: 'POST',
           body: JSON.stringify({
-            calendar_id: currentCalendarId,
-            receiver_id: selectedContact.contactee, // Use contactee number as receiver_id
+            calendar: currentCalendarId,
+            receiver: selectedContact.contactee, // Use contactee number as receiver_id
           }),
           headers: {
             'Content-Type': 'application/json',
