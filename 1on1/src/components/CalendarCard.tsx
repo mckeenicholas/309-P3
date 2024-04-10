@@ -11,6 +11,7 @@ interface CalendarCardProps {
   finalDay: string; // New prop to indicate the finalized day
   onEditAvailability: () => void;
   onFinalize: () => void;
+  onViewParticipants: () => void;
   isOwner: boolean; // New prop to indicate if the user is the owner of the calendar
 }
 
@@ -24,6 +25,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   finalDay,
   onEditAvailability,
   onFinalize,
+  onViewParticipants,
   isOwner,
 }) => {
   return (
@@ -47,6 +49,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           className="card-link px-3"
           data-bs-toggle="modal"
           data-bs-target={responsePending ? "#seeResults" : "#seeResultsGreen"}
+          onClick={onViewParticipants}
         >
           {responsePending ? "See participants - Waiting for responses" : "See participants - All have responded"}
         </a>

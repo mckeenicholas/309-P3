@@ -124,7 +124,11 @@ const DashboardPage: React.FC = () => {
 
   // View participants modal
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
-  const openParticipantsModal = () => setIsParticipantsModalOpen(true);
+  const openParticipantsModal = async (calendar: CalendarItem) => {
+    setCurrentCalendar(calendar);
+    await getParticipants();
+    setIsParticipantsModalOpen(true);
+  }
   const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
   const handleRemind = async (participant: Participant) => {
     // code for reminding a user to accept their invitation
@@ -197,6 +201,7 @@ const DashboardPage: React.FC = () => {
       console.error("Failed to update calendar");
       return;
     }
+
 
 
     closeFinalizeModal();
@@ -493,6 +498,7 @@ const DashboardPage: React.FC = () => {
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
                 onFinalize={() => openFinalizeModal(calendar)}
+                onViewParticipants={() => openParticipantsModal(calendar)}
                 finalTime={calendar.finalized_time || ""}
                 finalDay={dayOfWeekToString(calendar.finalized_day_of_week as number)} // Add type assertion here
                 isOwner={calendar.owner === currentUserId}
