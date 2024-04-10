@@ -360,10 +360,27 @@ const DashboardPage: React.FC = () => {
           console.log("Deleted non-busy time", nonBusyTime.id);
         }),
       );
-      // } else {
-      //   console.error("Failed to update calendar");
-      //   return;
-      // }
+      // Parse and add non-busy times for both creating a new calendar and updating an existing one
+      const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
+      const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
+
+      // Combine both lists of times
+      const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
+
+      // Add each non-busy time to the calendar
+      await Promise.all(
+        nonBusyTimes.map(async (time) => {
+          await apiFetch(`calendars/${currentCalendar.id}/nonbusytimes/`, {
+            method: "POST",
+            body: JSON.stringify(time),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          console.log("Created non-busy time", time);
+        }),
+      );
+
     } else {
       // If not in edit mode, create a new calendar
       let apiResponse = await apiFetch("calendars/", {
@@ -378,28 +395,30 @@ const DashboardPage: React.FC = () => {
         console.error("Failed to create calendar");
         return;
       }
+
+      // Parse and add non-busy times for both creating a new calendar and updating an existing one
+      const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
+      const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
+
+      // Combine both lists of times
+      const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
+
+      // Add each non-busy time to the calendar
+      await Promise.all(
+        nonBusyTimes.map(async (time) => {
+          await apiFetch(`calendars/${apiResponse.id}/nonbusytimes/`, {
+            method: "POST",
+            body: JSON.stringify(time),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          console.log("Created non-busy time", time);
+        }),
+      );
+
     }
 
-    // Parse and add non-busy times for both creating a new calendar and updating an existing one
-    const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
-    const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
-
-    // Combine both lists of times
-    const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
-
-    // Add each non-busy time to the calendar
-    await Promise.all(
-      nonBusyTimes.map(async (time) => {
-        await apiFetch(`calendars/${currentCalendar.id}/nonbusytimes/`, {
-          method: "POST",
-          body: JSON.stringify(time),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        console.log("Created non-busy time", time);
-      }),
-    );
 
     // Refetch calendars to update UI
     await fetchCalendars();
