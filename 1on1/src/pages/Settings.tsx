@@ -140,7 +140,7 @@ const Settings = () => {
 
       setShowMessage({
         status: "error",
-        message: formatErrors(error)
+        message: formatErrors(error),
       });
     } else {
       setShowMessage({

@@ -90,7 +90,7 @@ const SignupPage = () => {
 
       setHasError({
         status: "error",
-        message: formatErrors(error)
+        message: formatErrors(error),
       });
       setFormData({ ...formData, password1: "", password2: "" });
     } else {

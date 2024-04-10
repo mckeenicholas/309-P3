@@ -1,14 +1,6 @@
 import React from "react";
 import host from "./links";
 
-const setLocalStorage = (key: string, value: string) => {
-  localStorage.setItem(`1on1.${key}`, value);
-};
-
-const getLocalStorage = (key: string) => {
-  return localStorage.getItem(`1on1.${key}`);
-};
-
 interface IAuthContext {
   token: string | null;
   refresh: string | null;
@@ -29,13 +21,13 @@ const AuthContext = React.createContext<IAuthContext>({
 
 const AuthProvider = ({ children }: any) => {
   const [token, setToken] = React.useState<string | null>(
-    getLocalStorage("token"),
+    null,
   );
   const [userId, setUserId] = React.useState<string | null>(
-    getLocalStorage("userId"),
+    null,
   );
   const [refresh, setRefresh] = React.useState<string | null>(
-    getLocalStorage("refresh"),
+    null,
   );
 
   const logIn = async (username: string, password: string) => {
@@ -56,9 +48,6 @@ const AuthProvider = ({ children }: any) => {
 
       const { access, refresh } = await response.json();
 
-      setLocalStorage("token", access);
-      setLocalStorage("refresh", refresh);
-      setLocalStorage("username", username);
       setToken(access);
       setRefresh(refresh);
       setUserId(username);
@@ -119,7 +108,6 @@ const AuthProvider = ({ children }: any) => {
       } else {
         const data = await response.json();
         setToken(data.access);
-        setLocalStorage("token", data.access);
         return true;
       }
     } catch (error) {
