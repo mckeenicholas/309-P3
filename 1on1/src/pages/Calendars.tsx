@@ -357,7 +357,6 @@ const DashboardPage: React.FC = () => {
               method: "DELETE",
             },
           );
-          console.log("Deleted non-busy time", nonBusyTime.id);
         }),
       );
       // Parse and add non-busy times for both creating a new calendar and updating an existing one
@@ -377,7 +376,6 @@ const DashboardPage: React.FC = () => {
               "Content-Type": "application/json",
             },
           });
-          console.log("Created non-busy time", time);
         }),
       );
 
@@ -480,8 +478,6 @@ const DashboardPage: React.FC = () => {
           .filter((time) => time.preference_level === 1)
           .map((time) => formatTimeForState(time));
 
-        console.log("High priority times:", highPriorityTimes);
-        console.log("Low priority times:", lowPriorityTimes);
         setSelectedHighPriority(highPriorityTimes);
         setSelectedLowPriority(lowPriorityTimes);
       } catch (error) {
