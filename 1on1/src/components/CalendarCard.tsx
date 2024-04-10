@@ -40,8 +40,8 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         <h5 className="card-title">{title}</h5>
       </div>
       <ul className="list-group list-group-flush">
-        <li className="list-group-item">{date}</li>
-        <li className="list-group-item">{timeRange}</li>
+        <li className="list-group-item">Deadline: {formatDate(date)}</li>
+        <li className="list-group-item">Meeting duration: {timeRange} minutes</li>
       </ul>
       <div className="card-body">
         <a
@@ -72,12 +72,18 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           </button>
         ) : (
           <div>
-            <p>Meeting set: {finalDay} {finalTime}</p>
+            <p>Meeting set: {formatDate(finalDay)} {finalTime}</p>
           </div>
         )}
       </div>
     </div>
   );
+
+  function formatDate(date: string): string {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    const formattedDate = new Date(date).toLocaleDateString(undefined, options);
+    return formattedDate;
+  }
 };
 
 export default CalendarCard;

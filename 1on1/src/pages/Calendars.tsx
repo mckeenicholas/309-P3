@@ -428,7 +428,7 @@ const DashboardPage: React.FC = () => {
 
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">Calendars</h3>
-          <button type="button" className="btn btn-outline-success mt-3" onClick={() => openModal()}>
+          <button type="button" className="btn btn-outline-success mt-3" onClick={() => openModal()} style={{ marginBottom: '20px' }}>
             Create Calendar
           </button>
           <CalendarAddModal
