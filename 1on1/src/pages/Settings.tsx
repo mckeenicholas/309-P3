@@ -5,6 +5,7 @@ import host from "../utils/links";
 import { useAuth } from "../utils/AuthService";
 import { Badge, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { formatErrors } from "../utils/formatErrors";
 
 const Settings = () => {
   const initialFormData = {
@@ -139,9 +140,7 @@ const Settings = () => {
 
       setShowMessage({
         status: "error",
-        message: Object.values(error)
-          .flatMap((value) => value)
-          .join(" "),
+        message: formatErrors(error)
       });
     } else {
       setShowMessage({

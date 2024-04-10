@@ -4,6 +4,7 @@ import host from "../utils/links";
 import { Link, useNavigate } from "react-router-dom";
 import AuthRedirect from "../utils/AuthRedirect";
 import { IFormData, userMessage } from "../utils/types";
+import { formatErrors } from "../utils/formatErrors";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -89,9 +90,7 @@ const SignupPage = () => {
 
       setHasError({
         status: "error",
-        message: Object.values(error)
-          .flatMap((value) => value)
-          .join(" "),
+        message: formatErrors(error)
       });
       setFormData({ ...formData, password1: "", password2: "" });
     } else {

@@ -53,16 +53,16 @@ const Sidebar = forwardRef(() => {
             <i className="fas fa-cog me-2"></i>Settings
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/help" className="nav-link text-dark">
             <i className="fas fa-question-circle me-2"></i>Help
           </Link>
-        </li>
-        <li>
+        </li> */}
+        {/* <li>
           <Link to="/about" className="nav-link text-dark">
             <i className="fas fa-info-circle me-2"></i>About
           </Link>
-        </li>
+        </li> */}
         <li>
           <Link to="#" onClick={logoutWrapper} className="nav-link text-danger">
             <i className="fas fa-power-off me-2"></i>Logout
