@@ -63,8 +63,8 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         </a>
       </div>
       <div className="card-footer">
-        {finalTime === "" ? (
-          <button className="btn btn-primary" onClick={onFinalize} disabled={!allResponded && !isOwner}>
+        {finalTime === "" && isOwner ? (
+          <button className="btn btn-primary" onClick={onFinalize} disabled={!allResponded}>
             Finalize
           </button>
         ) : (

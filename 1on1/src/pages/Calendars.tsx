@@ -71,6 +71,7 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchUserId();
+    
     fetchCalendars();
     fetchPendingInvitations();
   }, [apiFetch]); // Combining fetch calls in a single useEffect for efficiency
