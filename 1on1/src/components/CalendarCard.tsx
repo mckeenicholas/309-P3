@@ -11,6 +11,7 @@ interface CalendarCardProps {
   finalDay: string; // New prop to indicate the finalized day
   onEditAvailability: () => void;
   onFinalize: () => void;
+  isOwner: boolean; // New prop to indicate if the user is the owner of the calendar
 }
 
 const CalendarCard: React.FC<CalendarCardProps> = ({
@@ -23,6 +24,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   finalDay,
   onEditAvailability,
   onFinalize,
+  isOwner,
 }) => {
   return (
     <div className="card border-dark" style={{ width: "18rem" }}>
@@ -62,7 +64,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
       </div>
       <div className="card-footer">
         {finalTime === "" ? (
-          <button className="btn btn-primary" onClick={onFinalize} disabled={!allResponded}>
+          <button className="btn btn-primary" onClick={onFinalize} disabled={!allResponded && !isOwner}>
             Finalize
           </button>
         ) : (

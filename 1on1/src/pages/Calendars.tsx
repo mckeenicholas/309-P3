@@ -13,6 +13,7 @@ import ParticipantsModal from '../components/ParticipantsModal';
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
   id: string;
+  owner: number;
   name: string;
   meeting_length: number;
   deadline: string;
@@ -53,6 +54,13 @@ const DashboardPage: React.FC = () => {
 
   const apiFetch = useRequest();
 
+  const fetchUserId = async () => {
+    const response = await apiFetch('accounts/get-user-id', { method: "GET" }); // Use GET method
+    if (response) {
+      setCurrentUserId(response.user_id); // Update state with fetched calendars
+    }
+  }
+
   useEffect(() => {
 
     const fetchPendingInvitations = async () => {
@@ -62,6 +70,7 @@ const DashboardPage: React.FC = () => {
       }
     };
 
+    fetchUserId();
     fetchCalendars();
     fetchPendingInvitations();
   }, [apiFetch]); // Combining fetch calls in a single useEffect for efficiency
@@ -97,6 +106,8 @@ const DashboardPage: React.FC = () => {
       console.error("Failed to decline the invitation");
     }
   }
+  const [currentUserId, setCurrentUserId] = useState<number>(0); // Assuming the user ID is a number
+
   // Create calendar modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [name, setName] = React.useState<string>("");
@@ -199,9 +210,6 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCalendars();
-  }, [apiFetch]); // Dependency array to avoid fetching more than once
 
   const parseSelectedTime = (selectedTime: string[], preferenceLevel: number) => {
     return selectedTime.map(time => {
@@ -480,6 +488,7 @@ const DashboardPage: React.FC = () => {
                 onFinalize={() => openFinalizeModal(calendar)}
                 finalTime={calendar.finalized_time || ""}
                 finalDay={dayOfWeekToString(calendar.finalized_day_of_week as number)} // Add type assertion here
+                isOwner={calendar.owner === currentUserId}
               />
             ))}
           </div>

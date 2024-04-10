@@ -13,6 +13,12 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from rest_framework.decorators import api_view
+
+@api_view(['GET'])
+def get_user_id(request):
+    user_id = request.user.id
+    return Response({"user_id": user_id})
 
 class Signup(APIView):
     def get(self, request):

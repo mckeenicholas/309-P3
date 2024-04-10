@@ -14,6 +14,8 @@ from .serializers import *
 
 CALENDAR_ACCESS_ERROR = {"error": "You are not authorized to access this calendar."}
 
+
+
 class CalendarAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
