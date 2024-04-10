@@ -40,7 +40,7 @@ const Contacts = () => {
 					const contacts: Contact[] = result.map((contact: RawContact) => ({
 						id: contact.id,
 						email: contact.contactee_info.email,
-						fullname: contact.contactee_info.first_name + contact.contactee_info.last_name,
+						fullname: contact.contactee_info.first_name + ' ' + contact.contactee_info.last_name,
 						contactee: contact.contactee
 					}));
 					setContacts(contacts);
