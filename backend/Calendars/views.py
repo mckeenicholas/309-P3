@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from Accounts.serializers import UserSerializer
 
 from .models import *
 from .serializers import *
@@ -79,14 +80,14 @@ def get_calendar_participant_name_emails(request, calendar_id):
     participants = CalendarParticipant.objects.filter(calendar=calendar_id)
     if not participants.filter(user=request.user).exists():
         return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
-    
     participant_data = []
     for participant in participants:
         user_id = participant.user.id
         user = User.objects.get(id=user_id)
+        serial_user = UserSerializer(user).data
         participant_data.append({
-            "name": user.first_name + " " + user.last_name,
-            "email": user.email
+            "name": serial_user.get('first_name', '') + " " + serial_user.get('last_name', ''),
+            "email": serial_user.get('email', '')
         })
     
     return Response(participant_data)
@@ -199,7 +200,7 @@ def send_email(request):
             'OneOnOne Reminder',
             request.data.get('emailbody'),
             'oneononeautoemail@gmail.com',
-            request.data.get('email'),
+            [request.data.get('email')],
             fail_silently=False,
         )
         return Response({"message": "Email sent successfully."}, status=status.HTTP_200_OK)

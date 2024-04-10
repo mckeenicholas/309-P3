@@ -124,7 +124,7 @@ const DashboardPage: React.FC = () => {
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
   const openParticipantsModal = async (calendar: CalendarItem) => {
     setCurrentCalendar(calendar);
-    await getParticipants();
+    await getParticipants(calendar.id);
     setIsParticipantsModalOpen(true);
   }
   const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
@@ -144,8 +144,8 @@ const DashboardPage: React.FC = () => {
     });
     console.log(apiResponse);
   };
-  const getParticipants = async () => {
-    const response = await apiFetch(`calendars/${currentCalendar.id}/participants-name-email/`, { method: "GET" });
+  const getParticipants = async (calendar_id: string) => {
+    const response = await apiFetch(`calendars/${calendar_id}/participants-name-email/`, { method: "GET" });
     if (response) {
       setCurrentCalendarParticipants(response);
     }
