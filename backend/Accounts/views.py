@@ -19,7 +19,7 @@ from rest_framework.decorators import api_view
 def get_user_id(request):
     user_id = request.user.id
     return Response({"user_id": user_id})
-
+        
 class Signup(APIView):
     def get(self, request):
         return Response({'message': 'Signup GET request'}, status=status.HTTP_200_OK)

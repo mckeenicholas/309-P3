@@ -45,7 +45,6 @@ interface NonBusyTime {
 interface Participant {
   name: string;
   email: string;
-  username: string;
   isAccepted: boolean;
 }
 
@@ -71,7 +70,7 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchUserId();
-    
+
     fetchCalendars();
     fetchPendingInvitations();
   }, [apiFetch]); // Combining fetch calls in a single useEffect for efficiency
@@ -134,7 +133,8 @@ const DashboardPage: React.FC = () => {
     const apiResponse = await apiFetch(`calendars/send-email/`, {
       method: "POST",
       body: JSON.stringify({
-        username: participant.username
+        email: participant.email,
+        emailbody: `You have an invitation to a meeting. Please accept or decline the invitation.`
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -142,16 +142,12 @@ const DashboardPage: React.FC = () => {
     });
     console.log(apiResponse);
   };
-  const getParticipants = () => {
-    // get participants for your calendar here.
-    const participant1: Participant = { name: 'Ali O', email: 'ali@gmail.com', username: 'username', isAccepted: false };
-    const participant2: Participant = { name: 'John Hah Bob sir johnson the 3rd', email: 'hehe@gmail.com', username: 'username', isAccepted: true };
-
-    const participants = [participant1, participant2];
-
-    //return list of participants.
-    return participants;
-  }
+  const getParticipants = async () => {
+    const response = await apiFetch(`calendars/${currentCalendar.id}/participants-name-email/`, { method: "GET" });
+    if (response) {
+      setCurrentCalendarParticipants(response);
+    }
+  };
 
 
 
@@ -162,6 +158,10 @@ const DashboardPage: React.FC = () => {
   const [selectedFinalTime, setSelectedFinalTime] = useState<NonBusyTime | null>(null);
 
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
+
+  // Participants modal
+  const [currentCalendarParticipants, setCurrentCalendarParticipants] = useState<Participant[]>([]);
+
   const openFinalizeModal = async (calendar: CalendarItem) => {
     setCurrentCalendar(calendar);
 
@@ -192,6 +192,12 @@ const DashboardPage: React.FC = () => {
         'Content-Type': 'application/json',
       },
     });
+
+    if (!apiResponse || !apiResponse.id) {
+      console.error("Failed to update calendar");
+      return;
+    }
+
 
     closeFinalizeModal();
 
@@ -470,7 +476,7 @@ const DashboardPage: React.FC = () => {
             onClose={closeParticipantsModal}
             onRemind={handleRemind}
             // call getParticipants here for your specific calendar.
-            participants={getParticipants()}
+            participants={currentCalendarParticipants}
           />
           {/* Button below for opening a modal that shows participants*/}
           {/* <button className="view-participants-btn btn btn-outline-success mt-5" onClick={openParticipantsModal}>View Participants</button> */}

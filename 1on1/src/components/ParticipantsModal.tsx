@@ -4,7 +4,6 @@ import '../styles/ParticipantsModal.css';
 interface Participant {
   name: string;
   email: string;
-  username: string;
   isAccepted: boolean;
 }
 

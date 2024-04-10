@@ -14,6 +14,9 @@ urlpatterns = [
           name='delete_or_update_calendar'),
 
      # Participants
+     path('<uuid:calendar_id>/participants-name-email/', 
+          views.get_calendar_participant_name_emails, 
+          name='participants_name_email'),
      path('<uuid:calendar_id>/participants/', 
           views.CalendarParticipantAPIView.as_view(), 
           name='participants'),
