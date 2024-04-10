@@ -4,11 +4,10 @@ import '../styles/ContactCard.css';
 interface CardProps {
 	name: string;
 	email: string;
-	phoneNumber: string;
 	onDelete: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ name, email, phoneNumber, onDelete }) => {
+const Card: React.FC<CardProps> = ({ name, email, onDelete }) => {
 	return (
 		<div className="card-container card border-dark">
 			<button className="delete-button" onClick={onDelete}>&times;</button>
@@ -16,7 +15,6 @@ const Card: React.FC<CardProps> = ({ name, email, phoneNumber, onDelete }) => {
 			<div className="info">
 				<h2>{name}</h2>
 				<p>{email}</p>
-				<p>{phoneNumber}</p>
 			</div>
 		</div>
 	);

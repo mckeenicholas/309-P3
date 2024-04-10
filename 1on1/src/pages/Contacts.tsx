@@ -26,12 +26,8 @@ interface Contact {
 
 const Contacts = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	// const [fullname, setFullname] = React.useState<string>("");
 	const [username, setUsername] = React.useState<string>("");
-	// const [email, setEmail] = React.useState<string>("");
-	const [phone, setPhone] = React.useState<string>("");
 	const [contacts, setContacts] = useState<Contact[]>([]);
-	// const [error, setError] = useState<string | null>(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 	const sendRequest = useRequest();
@@ -119,7 +115,6 @@ const Contacts = () => {
 								key={contact.id}
 								name={contact.fullname}
 								email={contact.email}
-								phoneNumber={'111-222-7878'}
 								onDelete={() => openDeleteModal(contact)}
 							/>
 						))}
@@ -134,8 +129,6 @@ const Contacts = () => {
 				onSave={saveChanges}
 				username={username}
 				setUsername={setUsername}
-				phone={phone}
-				setPhone={setPhone}
 			/>
 			<ContactDeleteConfirmationModal
 				isOpen={isDeleteModalOpen}
