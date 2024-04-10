@@ -14,12 +14,15 @@ from .serializers import *
 
 CALENDAR_ACCESS_ERROR = {"error": "You are not authorized to access this calendar."}
 
+
+
 class CalendarAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Get all calendars for user
-        calendars = Calendar.objects.filter(owner=request.user)
+        # Get all calendars the user is a participant of
+        participant_calendars = CalendarParticipant.objects.filter(user=request.user)
+        calendars = [participant.calendar for participant in participant_calendars]
         serializer = CalendarReadSerializer(calendars, many=True)
         return Response(serializer.data)
 
@@ -69,6 +72,24 @@ class CalendarAPIView(APIView):
 
         except Calendar.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_calendar_participant_name_emails(request, calendar_id):
+    # Check if user is a participant of the calendar
+    participants = CalendarParticipant.objects.filter(calendar=calendar_id)
+    if not participants.filter(user=request.user).exists():
+        return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
+    
+    participant_data = []
+    for participant in participants:
+        user_id = participant.user.id
+        user = User.objects.get(id=user_id)
+        participant_data.append({
+            "name": user.first_name + " " + user.last_name,
+            "email": user.email
+        })
+    
+    return Response(participant_data)
 
 class CalendarParticipantAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -172,23 +193,16 @@ class NonBusyTimeAPIView(APIView):
 
 @api_view(['POST'])
 def send_email(request):
-    username = request.data.get('username')
-    if not username:
-        return Response({"error": "No username provided."}, status=status.HTTP_400_BAD_REQUEST)
-
     try:
-        user = User.objects.get(username=username)
 
         send_mail(
             'OneOnOne Reminder',
-            'This is a reminder for your upcoming meeting.',
+            request.data.get('emailbody'),
             'oneononeautoemail@gmail.com',
-            [user.email],
+            request.data.get('email'),
             fail_silently=False,
         )
         return Response({"message": "Email sent successfully."}, status=status.HTTP_200_OK)
-    except user.DoesNotExist:
-        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({"error": f"Failed to send email. Error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -262,6 +276,14 @@ class UpdateInvitationStatusAPIView(generics.UpdateAPIView):
         if invitation.receiver != request.user:
             return Response({"error": "You are not authorized to update this invitation."}, status=status.HTTP_403_FORBIDDEN)
         
-        invitation.status = request.data.get('status', invitation.status)
+        status = request.data.get('status', invitation.status)
+        invitation.status = status
         invitation.save()
+        
+        if status == 'accepted':
+            # Check if the user is already a participant of the calendar
+            if not CalendarParticipant.objects.filter(calendar=invitation.calendar, user=request.user).exists():
+                # Add the user as a participant of the calendar
+                CalendarParticipant.objects.create(calendar=invitation.calendar, user=request.user)
+        
         return Response({"message": "Invitation status updated successfully."})

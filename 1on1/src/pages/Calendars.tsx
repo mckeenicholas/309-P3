@@ -8,12 +8,14 @@ import Sidebar from '../components/Sidebar';
 import DashNavbar from '../components/DashNavbar';
 import PendingInvites from '../components/PendingInvites';
 import FinalizeMeetingModal from '../components/FinalizeMeetingModal';
+import ParticipantsModal from '../components/ParticipantsModal';
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
   id: string;
+  owner: number;
   name: string;
-  meeting_length: string;
+  meeting_length: number;
   deadline: string;
   finalized_day_of_week?: number;
   finalized_time?: string; // Format: "HH:MM:SS"
@@ -39,18 +41,26 @@ interface NonBusyTime {
   preference_level: number;
 }
 
+// a datatype that represents a participants.
+interface Participant {
+  name: string;
+  email: string;
+  isAccepted: boolean;
+}
+
 const DashboardPage: React.FC = () => {
   const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([]);
 
   const apiFetch = useRequest();
 
+  const fetchUserId = async () => {
+    const response = await apiFetch('accounts/get-user-id', { method: "GET" }); // Use GET method
+    if (response) {
+      setCurrentUserId(response.user_id); // Update state with fetched calendars
+    }
+  }
+
   useEffect(() => {
-    const fetchCalendars = async () => {
-      const response = await apiFetch('calendars/', { method: "GET" });
-      if (response) {
-        setCalendars(response);
-      }
-    };
 
     const fetchPendingInvitations = async () => {
       const response = await apiFetch('/calendars/invitations/pending', { method: "GET" });
@@ -58,6 +68,8 @@ const DashboardPage: React.FC = () => {
         setPendingInvitations(response);
       }
     };
+
+    fetchUserId();
 
     fetchCalendars();
     fetchPendingInvitations();
@@ -71,9 +83,10 @@ const DashboardPage: React.FC = () => {
     });
 
     if (response) {
-      // Refresh calendars and invitations to reflect changes
+      // Remove the invitation from the pending list
       setPendingInvitations(current => current.filter(invite => invite.id !== invitationId));
-      // Optionally, fetch or update the calendars list if the calendar should be added immediately upon acceptance
+      // Fetch calendars to update the "My Calendars" section with the newly accepted calendar
+      fetchCalendars();
     } else {
       console.error("Failed to accept the invitation");
     }
@@ -93,6 +106,8 @@ const DashboardPage: React.FC = () => {
       console.error("Failed to decline the invitation");
     }
   }
+  const [currentUserId, setCurrentUserId] = useState<number>(0); // Assuming the user ID is a number
+
   // Create calendar modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [name, setName] = React.useState<string>("");
@@ -106,17 +121,93 @@ const DashboardPage: React.FC = () => {
   const [editMode, setEditMode] = useState(false); // Determines if the modal is in create or edit mode
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(null); // Tracks the ID of the calendar being edited
 
-  // Finalze meeting modal
-  const currentCalendarHighPriorityTimes: NonBusyTime[] = [];
-  const currentCalendarLowPriorityTimes: NonBusyTime[] = [];
+
+  // View participants modal
+  const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
+  const openParticipantsModal = async (calendar: CalendarItem) => {
+    setCurrentCalendar(calendar);
+    await getParticipants();
+    setIsParticipantsModalOpen(true);
+  }
+  const closeParticipantsModal = () => setIsParticipantsModalOpen(false);
+  const handleRemind = async (participant: Participant) => {
+    // code for reminding a user to accept their invitation
+    console.log(`Reminding ${participant.name}...`);
+    //replace sendRequest with apiFetch
+    const apiResponse = await apiFetch(`calendars/send-email/`, {
+      method: "POST",
+      body: JSON.stringify({
+        email: participant.email,
+        emailbody: `You have an invitation to a meeting. Please accept or decline the invitation.`
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log(apiResponse);
+  };
+  const getParticipants = async () => {
+    const response = await apiFetch(`calendars/${currentCalendar.id}/participants-name-email/`, { method: "GET" });
+    if (response) {
+      setCurrentCalendarParticipants(response);
+    }
+  };
+
+
+
+  // Finalize meeting modal
+  const [currentCalendarHighPriorityTimes, setCurrentCalendarHighPriorityTimes] = useState<NonBusyTime[]>([]);
+  const [currentCalendarLowPriorityTimes, setCurrentCalendarLowPriorityTimes] = useState<NonBusyTime[]>([]);
+  const [currentCalendar, setCurrentCalendar] = useState<CalendarItem>({} as CalendarItem);
+  const [selectedFinalTime, setSelectedFinalTime] = useState<NonBusyTime | null>(null);
+
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
-  const openFinalizeModal = () => setIsFinalizeModalOpen(true);
+
+  // Participants modal
+  const [currentCalendarParticipants, setCurrentCalendarParticipants] = useState<Participant[]>([]);
+
+  const openFinalizeModal = async (calendar: CalendarItem) => {
+    setCurrentCalendar(calendar);
+
+    let nonbusytimes = await fetchNonBusyTimes(calendar.id, false);
+    setCurrentCalendarHighPriorityTimes(nonbusytimes.filter(time => time.preference_level === 0));
+    setCurrentCalendarLowPriorityTimes(nonbusytimes.filter(time => time.preference_level === 1));
+    setIsFinalizeModalOpen(true);
+
+  };
   const closeFinalizeModal = () => setIsFinalizeModalOpen(false);
-  const saveFinalizeModal = async (selectedTime: NonBusyTime) => {
-    // Assuming the selected time is the finalized meeting time
-    // Perform the necessary logic to save the finalized meeting time
-    // Close the modal after saving
+  const saveFinalizeModal = async () => {
+    // Assuming the selected time is not null
+    // Prepare the calendar data
+    const calendarData = {
+      name: currentCalendar.name,
+      meeting_length: currentCalendar.meeting_length,
+      deadline: currentCalendar.deadline,
+      finalized_day_of_week: selectedFinalTime?.day_of_week,
+      finalized_time: selectedFinalTime?.start_time,
+    };
+
+    let apiResponse;
+    // If in edit mode and an editing calendar ID is set, update the existing calendar
+    apiResponse = await apiFetch(`calendars/${currentCalendar.id}/`, {
+      method: "PUT",
+      body: JSON.stringify(calendarData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!apiResponse || !apiResponse.id) {
+      console.error("Failed to update calendar");
+      return;
+    }
+
+
+
     closeFinalizeModal();
+
+    // Refetch calendars to update UI
+    await fetchCalendars();
   };
 
   const [calendars, setCalendars] = useState<CalendarItem[]>([]); // Use the CalendarItem interface here
@@ -128,9 +219,6 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCalendars();
-  }, [apiFetch]); // Dependency array to avoid fetching more than once
 
   const parseSelectedTime = (selectedTime: string[], preferenceLevel: number) => {
     return selectedTime.map(time => {
@@ -154,8 +242,6 @@ const DashboardPage: React.FC = () => {
     });
   };
   const saveChanges = async () => {
-    // Close the create calendar modal
-    closeCreateModal();
 
     // Prepare the calendar data
     const calendarData = {
@@ -248,7 +334,7 @@ const DashboardPage: React.FC = () => {
     if (calendarToEdit) {
       // Populate state with the data of the calendar being edited
       setName(calendarToEdit.name);
-      setMeetingLength(parseInt(calendarToEdit.meeting_length, 10));
+      setMeetingLength(calendarToEdit.meeting_length);
       setDeadline(new Date(calendarToEdit.deadline));
       setEditingCalendarId(calendarToEdit.id);
       setEditMode(true);
@@ -298,9 +384,32 @@ const DashboardPage: React.FC = () => {
   const createCalendar = async () => {
     await saveChanges();
     closeCreateModal();
+    closeEditModal();
   };
 
   const closeEditModal = () => setIsEditModalOpen(false);
+
+  const dayOfWeekToString = (dayOfWeek: number): string => {
+    switch (dayOfWeek) {
+
+      case 0:
+        return "Monday";
+      case 1:
+        return "Tuesday";
+      case 2:
+        return "Wednesday";
+      case 3:
+        return "Thursday";
+      case 4:
+        return "Friday";
+      case 5:
+        return "Saturday";
+      case 6:
+        return "Sunday";
+      default:
+        return "";
+    }
+  }
 
   return (
     <div id="wrapper" className="d-flex">
@@ -308,18 +417,19 @@ const DashboardPage: React.FC = () => {
         <div>
           {pendingInvitations.map(invite => (
             <PendingInvites
+              key={invite.id}
               id={invite.id}
-              cardTitle={invite.calendar.name}  // Adjust according to your data structure
+              cardTitle={invite.calendar.name}
               date={invite.date}
               time={invite.time}
-              onAccept={onAccept}
-              onDecline={onDecline}
+              onAccept={() => onAccept(invite.id)}
+              onDecline={() => onDecline(invite.id)}
             />
           ))}
         </div>
 
         <div className="container flex-wrap">
-          <h3 className="text-left fw-bold mt-3">My Calendars</h3>
+          <h3 className="text-left fw-bold mt-3">Calendars</h3>
           <button type="button" className="btn btn-outline-success mt-3" onClick={() => openModal()}>
             Create Calendar
           </button>
@@ -351,10 +461,24 @@ const DashboardPage: React.FC = () => {
             isOpen={isFinalizeModalOpen}
             onClose={closeFinalizeModal}
             onSave={saveFinalizeModal}
-            meetingLength={meetingLength}
+            meetingLength={currentCalendar.meeting_length}
             highPriorityTimes={currentCalendarHighPriorityTimes}
             lowPriorityTimes={currentCalendarLowPriorityTimes}
+            selectedFinalTime={selectedFinalTime}
+            setSelectedFinalTime={setSelectedFinalTime}
           />
+
+          <ParticipantsModal
+            isOpen={isParticipantsModalOpen}
+            onClose={closeParticipantsModal}
+            onRemind={handleRemind}
+            // call getParticipants here for your specific calendar.
+            participants={currentCalendarParticipants}
+          />
+          {/* Button below for opening a modal that shows participants*/}
+          {/* <button className="view-participants-btn btn btn-outline-success mt-5" onClick={openParticipantsModal}>View Participants</button> */}
+
+
           <div className="upcoming-cont">
             {calendars.map((calendar: CalendarItem) => ( // Use the CalendarItem interface here
               <CalendarCard
@@ -365,7 +489,11 @@ const DashboardPage: React.FC = () => {
                 responsePending={calendar.finalized_day_of_week === undefined || calendar.finalized_time === undefined}
                 allResponded={calendar.finalized_day_of_week !== undefined && calendar.finalized_time !== undefined}
                 onEditAvailability={() => openModal(calendar)}
-                onFinalize={openFinalizeModal}
+                onFinalize={() => openFinalizeModal(calendar)}
+                onViewParticipants={() => openParticipantsModal(calendar)}
+                finalTime={calendar.finalized_time || ""}
+                finalDay={dayOfWeekToString(calendar.finalized_day_of_week as number)} // Add type assertion here
+                isOwner={calendar.owner === currentUserId}
               />
             ))}
           </div>
