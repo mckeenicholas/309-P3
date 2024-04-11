@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import calendarPic from "/calendar.png"; // Adjust the path as necessary
+import { Modal } from "react-bootstrap";
 
 interface CalendarCardProps {
   title: string;
@@ -12,6 +13,7 @@ interface CalendarCardProps {
   onEditAvailability: () => void;
   onFinalize: () => void;
   onViewParticipants: () => void;
+  onDelete: () => void;
   isOwner: boolean; // New prop to indicate if the user is the owner of the calendar
 }
 
@@ -26,9 +28,41 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   onEditAvailability,
   onFinalize,
   onViewParticipants,
+  onDelete,
   isOwner,
 }) => {
+
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
+
+  console.log(showModal)
+
   return (
+    <>
+      <Modal show={showModal} onHide={handleClose}>
+    <Modal.Header closeButton>
+    <Modal.Title>Delete Calendar {title}?</Modal.Title>
+    </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this calendar? This cannot be undone!</Modal.Body>
+        <Modal.Footer>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleClose}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={onDelete}
+          >
+            Delete
+          </button>
+        </Modal.Footer>
+      </Modal>
     <div className="card border-dark" style={{ width: "18rem" }}>
       <img
         src={calendarPic}
@@ -36,6 +70,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         alt="Calendar"
         style={{ width: "50px", height: "auto" }} // Adjust the width as needed
       />
+      { isOwner && (<button className="delete-button" onClick={handleShow}>&times;</button>)}
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
       </div>
@@ -77,6 +112,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         )}
       </div>
     </div>
+    </>
   );
 
   function formatDate(date: string): string {

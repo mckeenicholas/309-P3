@@ -45,6 +45,7 @@ const generateCalendar = (name: string, calendars: Meeting[]) => {
     if (item.finalized_day_of_week !== null) {
       const dates = getMeetingDates(item);
       dates.map((date) => {
+        
         const startDateArray: ics.DateArray = [
           date.getFullYear(),
           date.getMonth() + 1, // Months are 1-based in ics format
@@ -53,12 +54,15 @@ const generateCalendar = (name: string, calendars: Meeting[]) => {
           date.getMinutes(),
         ];
 
+        const endDate = new Date(date);
+        endDate.setMinutes(endDate.getMinutes() + item.meeting_length);
+
         const endDateArray: ics.DateArray = [
-          date.getFullYear(),
-          date.getMonth() + 1,
-          date.getDate(),
-          date.getHours(),
-          date.getMinutes(),
+          endDate.getFullYear(),
+          endDate.getMonth() + 1,
+          endDate.getDate(),
+          endDate.getHours(),
+          endDate.getMinutes(),
         ];
 
         const icalEvent = {

@@ -27,7 +27,6 @@ const Settings = () => {
   ];
 
   const [userData, setUserData] = React.useState<IFormData>(initialFormData);
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const [showMessage, setShowMessage] = React.useState<userMessage>({
     status: null,
     message: "",
@@ -39,7 +38,6 @@ const Settings = () => {
   const { token, refresh } = useAuth();
   const navigate = useNavigate();
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
