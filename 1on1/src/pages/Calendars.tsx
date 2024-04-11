@@ -182,10 +182,6 @@ const DashboardPage: React.FC = () => {
     null,
   ); // Tracks the ID of the calendar being edited
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-
-  const handleClose = () => setShowModal(false);
-  const handleShow = () => setShowModal(true);
 
   // View participants modal
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
@@ -342,55 +338,40 @@ const DashboardPage: React.FC = () => {
       deadline: deadline?.toISOString(),
     };
 
-    if (editMode) {
+    let apiResponse;
+    if (editMode && editingCalendarId) {
       // If in edit mode and an editing calendar ID is set, update the existing calendar
-      // apiResponse = await apiFetch(`calendars/${editingCalendarId}/`, {
-      //   method: "PUT",
-      //   body: JSON.stringify(calendarData),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
+      apiResponse = await apiFetch(`calendars/${editingCalendarId}/`, {
+        method: "PUT",
+        body: JSON.stringify(calendarData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       // Assuming success in updating the calendar, now delete existing non-busy times
-      // if (apiResponse && apiResponse.id) {
-      const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(
-        currentCalendar.id,
-        true,
-      );
-      await Promise.all(
-        existingNonBusyTimes.map(async (nonBusyTime) => {
-          await apiFetch(
-            `calendars/${currentCalendar.id}/nonbusytimes/${nonBusyTime.id}/`,
-            {
-              method: "DELETE",
-            },
-          );
-        }),
-      );
-      // Parse and add non-busy times for both creating a new calendar and updating an existing one
-      const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
-      const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
-
-      // Combine both lists of times
-      const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
-
-      // Add each non-busy time to the calendar
-      await Promise.all(
-        nonBusyTimes.map(async (time) => {
-          await apiFetch(`calendars/${currentCalendar.id}/nonbusytimes/`, {
-            method: "POST",
-            body: JSON.stringify(time),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-        }),
-      );
-
+      if (apiResponse && apiResponse.id) {
+        const existingNonBusyTimes: NonBusyTime[] = await fetchNonBusyTimes(
+          editingCalendarId,
+          true,
+        );
+        await Promise.all(
+          existingNonBusyTimes.map(async (nonBusyTime) => {
+            await apiFetch(
+              `calendars/${editingCalendarId}/nonbusytimes/${nonBusyTime.id}/`,
+              {
+                method: "DELETE",
+              },
+            );
+          }),
+        );
+      } else {
+        console.error("Failed to update calendar");
+        return;
+      }
     } else {
       // If not in edit mode, create a new calendar
-      let apiResponse = await apiFetch("calendars/", {
+      apiResponse = await apiFetch("calendars/", {
         method: "POST",
         body: JSON.stringify(calendarData),
         headers: {
@@ -402,30 +383,27 @@ const DashboardPage: React.FC = () => {
         console.error("Failed to create calendar");
         return;
       }
-
-      // Parse and add non-busy times for both creating a new calendar and updating an existing one
-      const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
-      const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
-
-      // Combine both lists of times
-      const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
-
-      // Add each non-busy time to the calendar
-      await Promise.all(
-        nonBusyTimes.map(async (time) => {
-          await apiFetch(`calendars/${apiResponse.id}/nonbusytimes/`, {
-            method: "POST",
-            body: JSON.stringify(time),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          console.log("Created non-busy time", time);
-        }),
-      );
-
     }
 
+    // Parse and add non-busy times for both creating a new calendar and updating an existing one
+    const highPriorityTimes = parseSelectedTime(selectedHighPriority, 0);
+    const lowPriorityTimes = parseSelectedTime(selectedLowPriority, 1);
+
+    // Combine both lists of times
+    const nonBusyTimes = [...highPriorityTimes, ...lowPriorityTimes];
+
+    // Add each non-busy time to the calendar
+    await Promise.all(
+      nonBusyTimes.map(async (time) => {
+        await apiFetch(`calendars/${apiResponse.id}/nonbusytimes/`, {
+          method: "POST",
+          body: JSON.stringify(time),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }),
+    );
 
     // Refetch calendars to update UI
     await fetchCalendars();
@@ -451,7 +429,7 @@ const DashboardPage: React.FC = () => {
       await Promise.all(
         nonBusyTimes.map(async (time: any) => {
           await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
-            method: "GET",
+            method: "POST",
             body: JSON.stringify(time),
             headers: {
               "Content-Type": "application/json",
@@ -469,7 +447,6 @@ const DashboardPage: React.FC = () => {
 
   const openModal = async (calendarToEdit?: CalendarItem) => {
     if (calendarToEdit) {
-      setCurrentCalendar(calendarToEdit);
       // Populate state with the data of the calendar being edited
       setName(calendarToEdit.name);
       setMeetingLength(calendarToEdit.meeting_length);
@@ -646,27 +623,6 @@ const DashboardPage: React.FC = () => {
         Upload Calendar Export
       </button>
       <input onChange={event => handleChange(event as { target: { files: Iterable<unknown> | ArrayLike<unknown>; }; })} multiple={false} ref={fileInputRef} type='file'hidden/>
-      <Modal.Header closeButton>
-          <Modal.Title>Are you sure?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>This cannot be undone!</Modal.Body>
-        <Modal.Footer>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={handleClose}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={deleteAccount}
-          >
-            Delete my account
-          </button>
-        </Modal.Footer>
-      </Modal>
           <CalendarAddModal
             isOpen={isCreateModalOpen}
             onClose={closeCreateModal}
