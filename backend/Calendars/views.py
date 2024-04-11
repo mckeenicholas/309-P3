@@ -61,7 +61,13 @@ class CalendarAPIView(APIView):
         try:
             calendar = Calendar.objects.get(id=calendar_id)
             # Check if user is the owner of the calendar
-            if calendar.owner != request.user:
+            # if calendar.owner != request.user:
+            #     return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
+
+            participants = CalendarParticipant.objects.filter(calendar=calendar_id)
+
+            # Check if user is a participant of the calendar
+            if not participants.filter(user=request.user).exists():
                 return Response(CALENDAR_ACCESS_ERROR, status=status.HTTP_403_FORBIDDEN)
                 
             serializer = CalendarWriteSerializer(calendar, data=request.data)

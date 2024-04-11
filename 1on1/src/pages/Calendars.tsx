@@ -203,6 +203,7 @@ const DashboardPage: React.FC = () => {
       },
     });
     console.log(apiResponse);
+    
   };
   const getParticipants = async (calendar_id: string) => {
     const response = await apiFetch(
@@ -335,6 +336,8 @@ const DashboardPage: React.FC = () => {
       deadline: deadline?.toISOString(),
     };
 
+    console.log("test")
+
     let apiResponse;
     if (editMode && editingCalendarId) {
       // If in edit mode and an editing calendar ID is set, update the existing calendar
@@ -422,18 +425,18 @@ const DashboardPage: React.FC = () => {
       // Assuming apiFetch either throws an error or returns the JSON-parsed body directly
       const nonBusyTimes = response; // Assuming the response directly contains the array of NonBusyTime objects
 
-      // Use Promise.all() to make API calls asynchronously and in parallel
-      await Promise.all(
-        nonBusyTimes.map(async (time: any) => {
-          await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
-            method: "POST",
-            body: JSON.stringify(time),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-        }),
-      );
+      // // Use Promise.all() to make API calls asynchronously and in parallel
+      // await Promise.all(
+      //   nonBusyTimes.map(async (time: any) => {
+      //     await apiFetch(`calendars/${calendarId}/nonbusytimes/`, {
+      //       method: "POST",
+      //       body: JSON.stringify(time),
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //       },
+      //     });
+      //   }),
+      // );
 
       return nonBusyTimes;
     } catch (error) {
@@ -543,10 +546,7 @@ const DashboardPage: React.FC = () => {
             const start = new Date(value.start);
             const end = new Date(value.end);
 
-            console.log(value);
-
             const differenceInMilliseconds = end.getTime() - start.getTime();
-            console.log(differenceInMilliseconds);
             const length = differenceInMilliseconds / (1000 * 60);
 
             const calendarData = {
