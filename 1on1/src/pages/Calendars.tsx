@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, MutableRefObject } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CalendarCard from "../components/CalendarCard";
 import CalendarAddModal from "../components/CalendarAddModal";
 import CalendarEditModal from "../components/CalendarEditModal";
@@ -11,8 +11,6 @@ import generateCalendar from "../utils/icalGenerator";
 import { Meeting } from "../utils/types";
 import parseiCal from "../utils/icalPraser";
 import { FullCalendar } from "ical";
-import { getDay } from "date-fns";
-import { Modal } from "react-bootstrap";
 
 // Define a TypeScript interface for the calendar items
 interface CalendarItem {
@@ -181,7 +179,6 @@ const DashboardPage: React.FC = () => {
   const [editingCalendarId, setEditingCalendarId] = useState<string | null>(
     null,
   ); // Tracks the ID of the calendar being edited
-
 
   // View participants modal
   const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
@@ -528,55 +525,63 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const fileInputRef=useRef();
-  
-  const handleChange = async (e: { target: { files: Iterable<unknown> | ArrayLike<unknown>; }; }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = async (e: {
+    target: { files: Iterable<unknown> | ArrayLike<unknown> };
+  }) => {
     const files = Array.from(e.target.files);
 
-    const events = await parseiCal(files as unknown as FileList) as FullCalendar[];
+    const events = (await parseiCal(
+      files as unknown as FileList,
+    )) as FullCalendar[];
 
-    const promises = events.map(async (event: ArrayLike<unknown> | { [s: string]: unknown; }) => {
-        return Promise.all(Object.values(event).map(async (value: any) => {
+    const promises = events.map(
+      async (event: ArrayLike<unknown> | { [s: string]: unknown }) => {
+        return Promise.all(
+          Object.values(event).map(async (value: any) => {
             const start = new Date(value.start);
             const end = new Date(value.end);
 
-            console.log(value)
+            console.log(value);
 
             const differenceInMilliseconds = end.getTime() - start.getTime();
             console.log(differenceInMilliseconds);
             const length = differenceInMilliseconds / (1000 * 60);
 
             const calendarData = {
-                name: value.summary,
-                meeting_length: length,
-                deadline: end,
+              name: value.summary,
+              meeting_length: length,
+              deadline: end,
             };
 
             const apiResponse = await apiFetch("calendars/", {
-                method: "POST",
-                body: JSON.stringify(calendarData),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+              method: "POST",
+              body: JSON.stringify(calendarData),
+              headers: {
+                "Content-Type": "application/json",
+              },
             });
 
             if (!apiResponse || !apiResponse.id) {
-                console.error("Failed to create calendar");
-                return;
+              console.error("Failed to create calendar");
+              return;
             }
-        }));
-    });
+          }),
+        );
+      },
+    );
 
     await Promise.all(promises);
     await fetchCalendars(); // After all calls are done, fetch the calendars to update list
-};
+  };
 
   const confirmCalendarDelete = async (calendar: CalendarItem) => {
-    
     // Delete calendar then re-load list of calendars
-    apiFetch(`calendars/${calendar.id}/`, { method: "DELETE"}).then(() => fetchCalendars())
-
-  }
+    apiFetch(`calendars/${calendar.id}/`, { method: "DELETE" }).then(() =>
+      fetchCalendars(),
+    );
+  };
 
   return (
     <div id="wrapper" className="d-flex">
@@ -616,13 +621,26 @@ const DashboardPage: React.FC = () => {
             Download Finalized Calendars
           </button>
           <button
-          type="button"
-          className="btn btn-outline-success mt-3"
-           onClick={()=>fileInputRef.current.click()}
-           style={{ marginBottom: "20px" }}>
-        Upload Calendar Export
-      </button>
-      <input onChange={event => handleChange(event as { target: { files: Iterable<unknown> | ArrayLike<unknown>; }; })} multiple={false} ref={fileInputRef} type='file'hidden/>
+            type="button"
+            className="btn btn-outline-success mt-3"
+            onClick={() => fileInputRef.current?.click()}
+            style={{ marginBottom: "20px" }}
+          >
+            Upload Calendar Export
+          </button>
+          <input
+            onChange={(event) =>
+              handleChange(
+                event as {
+                  target: { files: Iterable<unknown> | ArrayLike<unknown> };
+                },
+              )
+            }
+            multiple={false}
+            ref={fileInputRef}
+            type="file"
+            hidden
+          />
           <CalendarAddModal
             isOpen={isCreateModalOpen}
             onClose={closeCreateModal}

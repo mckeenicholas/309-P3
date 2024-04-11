@@ -1,7 +1,6 @@
-import React from 'react';
-import '../styles/ContactAddModal.css';
-import { useState, useEffect} from 'react';
-
+import React from "react";
+import "../styles/ContactAddModal.css";
+import { useState, useEffect } from "react";
 
 interface ContactAddModalProps {
   isOpen: boolean;
@@ -10,7 +9,6 @@ interface ContactAddModalProps {
   username: string;
   setUsername: React.Dispatch<React.SetStateAction<string>>;
 }
-
 
 const ContactAddModal: React.FC<ContactAddModalProps> = ({
   isOpen,
@@ -23,7 +21,7 @@ const ContactAddModal: React.FC<ContactAddModalProps> = ({
 
   const handleSave = () => {
     if (!username) {
-      setSaveAttempted(true); 
+      setSaveAttempted(true);
     } else {
       onSave();
     }
@@ -31,7 +29,7 @@ const ContactAddModal: React.FC<ContactAddModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setUsername('');
+      setUsername("");
       setSaveAttempted(false);
     }
   }, [isOpen]);
@@ -46,15 +44,31 @@ const ContactAddModal: React.FC<ContactAddModalProps> = ({
         <div className="modal-body">
           <div className="mb-3">
             <label className="form-label">Username</label>
-            <input type="username" className="form-control" id="username" name="username" required
+            <input
+              type="username"
+              className="form-control"
+              id="username"
+              name="username"
+              required
               onChange={(e) => setUsername(e.target.value)}
-              value={username}/>
-            {saveAttempted && !username && <div style={{color: 'red'}}>This field cannot be blank.</div>}
+              value={username}
+            />
+            {saveAttempted && !username && (
+              <div style={{ color: "red" }}>This field cannot be blank.</div>
+            )}
           </div>
         </div>
         <div className="modal-footer">
-          <button onClick={onClose} className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button onClick={handleSave} className="btn btn-primary">Save changes</button>
+          <button
+            onClick={onClose}
+            className="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button onClick={handleSave} className="btn btn-primary">
+            Save changes
+          </button>
         </div>
       </div>
     </div>

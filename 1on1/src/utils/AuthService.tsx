@@ -20,15 +20,9 @@ const AuthContext = React.createContext<IAuthContext>({
 });
 
 const AuthProvider = ({ children }: any) => {
-  const [token, setToken] = React.useState<string | null>(
-    null,
-  );
-  const [userId, setUserId] = React.useState<string | null>(
-    null,
-  );
-  const [refresh, setRefresh] = React.useState<string | null>(
-    null,
-  );
+  const [token, setToken] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | null>(null);
+  const [refresh, setRefresh] = React.useState<string | null>(null);
 
   const logIn = async (username: string, password: string) => {
     try {
