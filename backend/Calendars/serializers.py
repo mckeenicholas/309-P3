@@ -40,6 +40,7 @@ class InvitationWriteSerializer(serializers.ModelSerializer):
         exclude = ('sender',)
 
 class InvitationReadSerializer(serializers.ModelSerializer):
+    calendar = CalendarReadSerializer()
     class Meta:
         model = Invitation
         fields = '__all__'

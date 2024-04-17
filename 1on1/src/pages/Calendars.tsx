@@ -586,20 +586,6 @@ const DashboardPage: React.FC = () => {
   return (
     <div id="wrapper" className="d-flex">
       <div id="page-content-wrapper">
-        <div>
-          {pendingInvitations.map((invite) => (
-            <PendingInvites
-              key={invite.id}
-              id={invite.id}
-              cardTitle={invite.calendar.name}
-              date={invite.date}
-              time={invite.time}
-              onAccept={() => onAccept(invite.id)}
-              onDecline={() => onDecline(invite.id)}
-            />
-          ))}
-        </div>
-
         <div className="container flex-wrap">
           <h3 className="text-left fw-bold mt-3">Calendars</h3>
           <button
@@ -717,6 +703,20 @@ const DashboardPage: React.FC = () => {
                 />
               ),
             )}
+          </div>
+          <div className="container flex-wrap">
+          <h3 className="text-left fw-bold mt-3">Invitations</h3>
+            <div>
+              {pendingInvitations.map((invite) => (
+                <PendingInvites
+                  key={invite.id}
+                  id={invite.id}
+                  cardTitle={invite.calendar.name}
+                  onAccept={() => onAccept(invite.id)}
+                  onDecline={() => onDecline(invite.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
